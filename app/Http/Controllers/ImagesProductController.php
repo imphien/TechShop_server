@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\ImagesProduct;
 
 class ImagesProductController extends Controller
 {
@@ -34,8 +35,26 @@ class ImagesProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $imageProduct = new ImagesProduct;
+        $imageProduct->image_id = 'image'.time();
+        $imageProduct->product_id = $request->product_id;
+        $imageProduct->url=$request->url;
+        $result = $imageProduct->save();
+        if( $result)
+        {
+            return ["Result"=>"Data has been saved"];
+        }else
+        {
+            return ["Result"=>"Error"];
+        }  
     }
+
+    public function upload(Request $request)
+    {
+        $result = $request->file('file')->store('public/images');
+        return ["result"=>$result];
+    }
+    
 
     /**
      * Display the specified resource.
@@ -81,4 +100,6 @@ class ImagesProductController extends Controller
     {
         //
     }
+
+    
 }

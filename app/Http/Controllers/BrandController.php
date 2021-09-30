@@ -3,10 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Brand;
-use App\Http\Resources\BrandResource;
-use App\Http\Resources\BrandCollection;
-use Carbon\Carbon;
 
 class BrandController extends Controller
 {
@@ -17,7 +13,7 @@ class BrandController extends Controller
      */
     public function index()
     {
-        return new BrandCollection(Brand::paginate(2));
+        //
     }
 
     /**
@@ -38,17 +34,7 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        $brand = new Brand;
-        $brand->brand_id = 'brand'.time();
-        $brand->brand_name=$request->brand_name;
-        $result = $brand->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been saved"];
-        }else
-        {
-            return ["Result"=>"Error"];
-        }  
+        //
     }
 
     /**
@@ -57,9 +43,9 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($brand_id)
+    public function show($id)
     {
-        return Brand::find($brand_id);
+        //
     }
 
     /**
@@ -80,18 +66,9 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,Brand $brand_id)
+    public function update(Request $request, $id)
     {
-        $brand = Brand::find($request->brand_id);
-        $brand->brand_name=$request->brand_name;
-        $result = $brand->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been updated"];
-        }else
-        {
-            return ["Result"=>"Error"];
-        }  
+        //
     }
 
     /**
@@ -100,19 +77,8 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function delete(Request $request,Brand $brand_id)
+    public function destroy($id)
     {
-        $brand = Brand::find($request->brand_id);
-        $brand->deleted_at= Carbon::now();
-        $result = $brand->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been delete"];
-        }else
-        {
-            return ["Result"=>"Error"];
-        }
+        //
     }
-
-    
 }
