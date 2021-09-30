@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\CPU;
+use App\Models\CategoryCPU;
+use Illuminate\Support\Facades\DB;
 
 class CPUController extends Controller
 {
@@ -11,6 +14,7 @@ class CPUController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    
     public function index()
     {
         //
@@ -34,7 +38,21 @@ class CPUController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $cpu_id = DB::table('tbl_categorycpu')
+                    ->select('category_cpu_id')
+                    ->get();
+        $CPU = new CPU;
+        $CPU->cpu_id = 'cpu'.time();
+        $CPU->cpu_name=$request->cpu_name;
+        $CPU->category_cpu_id=
+        $result = $brand->save();
+        if( $result)
+        {
+            return ["Result"=>"Data has been saved"];
+        }else
+        {
+            return ["Result"=>"Error"];
+        }  
     }
 
     /**

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryCPU extends Model
 {
     protected $table = "tbl_categorycpu";
+    protected $primaryKey = "category_cpu_id";
 
     public function cpu()
     {

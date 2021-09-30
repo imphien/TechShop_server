@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CPU extends Model
 {
     protected $table = "tbl_cpu";
+    protected $primaryKey = "cpu_id";
 
     public function product()
     {

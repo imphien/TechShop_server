@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\RAM;
 
 class RAMController extends Controller
 {
@@ -13,7 +14,7 @@ class RAMController extends Controller
      */
     public function index()
     {
-        //
+        return RAM::all();
     }
 
     /**

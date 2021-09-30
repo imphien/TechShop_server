@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $table = "tbl_product";
+    protected $primaryKey = "product_id"; 
 
     public function cpu(){
         return $this->belongsTo('App\Models\CPU','cpu_id','product_id');
