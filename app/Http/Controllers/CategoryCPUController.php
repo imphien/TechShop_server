@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\CategoryCPU;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class CategoryCPUController extends Controller
 {
@@ -13,7 +16,9 @@ class CategoryCPUController extends Controller
      */
     public function index()
     {
-        //
+        $categorycpu = DB::table('tbl_categorycpu')
+                    ->simplePaginate(10);
+        return $categorycpu;
     }
 
     /**
@@ -32,9 +37,20 @@ class CategoryCPUController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, CategoryCPU $category_cpu_id)
     {
-        //
+        $categorycpu = new CategoryCPU;
+            $categorycpu->category_cpu_id='category_cpu'.time();
+            $categorycpu->category_cpu_name=$request->category_cpu_name;
+            $result = $categorycpu->save();
+            if( $result)
+            {
+                return ["Result"=>"Data has been saved"];
+            }
+            else
+            {
+                return ["Result"=>"Error"];
+            }
     }
 
     /**
@@ -66,9 +82,19 @@ class CategoryCPUController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, CategoryCPU $category_cpu_id)
     {
-        //
+        $categorycpu = CategoryCPU::find($request->category_cpu_id);
+            $categorycpu->category_cpu_name=$request->category_cpu_name;
+            $result = $categorycpu->save();
+            if( $result)
+            {
+                return ["Result"=>"Data has been saved"];
+            }
+            else
+            {
+                return ["Result"=>"Error"];
+            }
     }
 
     /**
@@ -77,8 +103,18 @@ class CategoryCPUController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, CategoryCPU $category_cpu_id)
     {
-        //
+        $categorycpu = CategoryCPU::find($request->category_cpu_id);
+        $categorycpu->deleted_at=Carbon::now();
+        $result = $categorycpu->save();
+        if( $result)
+        {
+            return ["Result"=>"Data has been saved"];
+        }
+        else
+        {
+            return ["Result"=>"Error"];
+        }
     }
 }
