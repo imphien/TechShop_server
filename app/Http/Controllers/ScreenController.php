@@ -3,6 +3,11 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Screen;
+use App\Models\CategoryScreen;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class ScreenController extends Controller
 {
@@ -13,7 +18,9 @@ class ScreenController extends Controller
      */
     public function index()
     {
-        //
+        $screen = DB::table('tbl_screen')
+                    ->simplePaginate(10);
+        return $screen;
     }
 
     /**
@@ -34,7 +41,36 @@ class ScreenController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $rules = array(
+            "category_screen_id"=>[
+                'required',
+                Rule::exists('tbl_categoryscreen')->where(function ($query) {
+                    $query->get('category_screen_id');
+                }),
+            ]
+        );
+        $validator = Validator::make($request->all(),$rules);
+        if($validator->fails())
+        {
+            return $validator->errors();
+        }
+        else
+        {
+            $screen = new Screen;
+            $screen->screen_id='screen'.time();
+            $screen->category_screen_id=$request->category_screen_id;
+            $screen->screen_detail=$request->screen_detail;
+
+            $result = $screen->save();
+            if( $result)
+            {
+                return ["Result"=>"Data has been saved"];
+            }
+            else
+            {
+                return ["Result"=>"Error"];
+            }
+        }
     }
 
     /**
@@ -66,9 +102,37 @@ class ScreenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Screen $screen)
     {
-        //
+        $rules = array(
+            "category_screen_id"=>[
+                'required',
+                Rule::exists('tbl_categoryscreen')->where(function ($query) {
+                    $query->get('category_screen_id');
+                }),
+            ]
+        );
+        $validator = Validator::make($request->all(),$rules);
+        if($validator->fails())
+        {
+            return $validator->errors();
+        }
+        else
+        {
+            $screen = Screen::find($request->screen_id);
+            $screen->category_screen_id=$request->category_screen_id;
+            $screen->screen_detail=$request->screen_detail;
+
+            $result = $screen->save();
+            if( $result)
+            {
+                return ["Result"=>"Data has been saved"];
+            }
+            else
+            {
+                return ["Result"=>"Error"];
+            }
+        }
     }
 
     /**
@@ -77,8 +141,19 @@ class ScreenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, Screen $screen)
     {
-        //
+        $screen = Screen::find($request->screen_id);
+            $screen->deleted_at=$request->Carbon::now();
+
+            $result = $screen->save();
+            if( $result)
+            {
+                return ["Result"=>"Data has been saved"];
+            }
+            else
+            {
+                return ["Result"=>"Error"];
+            }
     }
 }

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Brand;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class BrandController extends Controller
 {
@@ -13,7 +16,9 @@ class BrandController extends Controller
      */
     public function index()
     {
-        //
+        $brand = DB::table('tbl_brand')
+                    ->simplePaginate(10);
+        return $brand;
     }
 
     /**
@@ -23,7 +28,7 @@ class BrandController extends Controller
      */
     public function create()
     {
-        //
+        
     }
 
     /**
@@ -34,7 +39,18 @@ class BrandController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $brand = new Brand;
+            $brand->brand_id='brand'.time();
+            $brand->brand_name=$request->brand_name;
+            $result = $brand->save();
+            if( $result)
+            {
+                return ["Result"=>"Data has been saved"];
+            }
+            else
+            {
+                return ["Result"=>"Error"];
+            }
     }
 
     /**
@@ -43,7 +59,7 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Brand $brand)
     {
         //
     }
@@ -66,9 +82,19 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Brand $brand_id)
     {
-        //
+        $brand = Brand::find($request->brand_id);
+        $brand->brand_name=$request->brand_name;
+        $result = $brand->save();
+        if( $result)
+        {
+            return ["Result"=>"Data has been saved"];
+        }
+        else
+        {
+            return ["Result"=>"Error"];
+        }
     }
 
     /**
@@ -77,8 +103,17 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, Brand $band_id)
     {
-        //
+        $brand = Brand::find($request->band_id);
+        $brand->deleted_at= Carbon::now();
+        $result = $brand->save();
+        if( $result)
+        {
+            return ["Result"=>"Data has been delete"];
+        }else
+        {
+            return ["Result"=>"Error"];
+        }
     }
 }

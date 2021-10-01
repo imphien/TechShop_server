@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 
 
@@ -29,9 +30,20 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Product $product)
     {
-        return new ProductCollection(Product::paginate(10));
+        // $product = DB::table('tbl_product')
+        //             ->simplePaginate(10);
+        //         return $product;
+        // $data = $product->toArray();
+        // $data['image_product'] = $product->image_product()->take(5)-toArray();
+        $product = Product::with('image_product')
+                    ->get();
+         $product['image_product'] = DB::table('tbl_imagesproduct') -> get();
+        return response()->json($product,200);
+
+
+
     }
 
     public function countProduct()
@@ -50,10 +62,10 @@ class ProductController extends Controller
                                     ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
                                     ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
                                     ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
-                                    ->join('tbl_imagesproduct','tbl_product.product_id','=','tbl_imagesproduct.product_id')
                                     ->whereNotNull('tbl_product.deleted_at')
                                     ->select('product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
-                                    'price','discount','product_detail','url')
+                                    'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
+                                    ->orderBy('tbl_product.product_id')
                                     ->simplePaginate(10);;
         return $product_deleted;
     }
@@ -68,10 +80,9 @@ class ProductController extends Controller
                                     ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
                                     ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
                                     ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
-                                    ->join('tbl_imagesproduct','tbl_product.product_id','=','tbl_imagesproduct.product_id')
                                     ->whereNull('tbl_product.deleted_at')
                                     ->select('product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
-                                    'price','discount','product_detail','url')
+                                    'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
                                     ->simplePaginate(10);
                                     
         return $product_not_deleted;
@@ -79,6 +90,7 @@ class ProductController extends Controller
 
     public function get_product_detail()
     {
+
         $product_detail = DB::table('tbl_product')
         ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
         ->join('tbl_harddisk','tbl_harddisk.harddisk_id','=','tbl_product.harddisk_id')
@@ -87,12 +99,34 @@ class ProductController extends Controller
         ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
         ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
         ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
-        ->join('tbl_imagesproduct','tbl_product.product_id','=','tbl_imagesproduct.product_id')
-        ->select('product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
-        'price','discount','product_detail','url')
-        ->simplePaginate(10);
-        
-        return $product_detail;
+        ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
+        'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
+        ->get()->toArray();
+        $array_product = array_column($product_detail,'product_id'); 
+         $url = DB::table('tbl_imagesproduct')
+                ->whereIn('product_id',$array_product)
+                ->select('url','product_id')
+                ->get()->toArray();
+         $array_images = [];
+        foreach($url as $value)
+            {
+               $array_images[$value->product_id][] = $value->url;
+            }
+        foreach($product_detail as $key=>$pr)
+            {
+                if(isset($array_images[$pr->product_id]) )
+                    {
+                       
+                        $product_detail[$key]->images = $array_images[$pr->product_id];
+                    }
+                else
+                    {
+                        $product_detail[$key]->images =[];
+                    }
+                }
+                return $product_detail;
+        // return new ProductCollection(Product::paginate(10));
+   
     }
     
     /**
@@ -189,6 +223,7 @@ class ProductController extends Controller
             $product->product_detail=$request->product_detail;
 
             $result = $product->save();
+            $this->save_image($product->product_id);
             if( $result)
             {
                 return ["Result"=>"Data has been saved"];
@@ -208,7 +243,7 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
+        
     }
 
     /**
@@ -293,7 +328,6 @@ class ProductController extends Controller
             $product->price=$request->price;
             $product->discount=$request->discount;
             $product->product_detail=$request->product_detail;
-
             $result = $product->save();
             if( $result)
             {

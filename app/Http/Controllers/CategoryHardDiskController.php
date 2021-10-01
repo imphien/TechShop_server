@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\CategoryHardDisk;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class CategoryHardDiskController extends Controller
 {
@@ -13,7 +16,9 @@ class CategoryHardDiskController extends Controller
      */
     public function index()
     {
-        //
+        $categoryharddisk = DB::table('tbl_categoryharddisk')
+                    ->simplePaginate(10);
+        return $categoryharddisk;
     }
 
     /**
@@ -34,7 +39,18 @@ class CategoryHardDiskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $categoryharddisk = new CategoryHardDisk;
+        $categoryharddisk->category_harddisk_id='category_harddisk'.time();
+        $categoryharddisk->category_harddisk_name=$request->category_harddisk_name;
+        $result = $categoryharddisk->save();
+        if( $result)
+        {
+            return ["Result"=>"Data has been saved"];
+        }
+        else
+        {
+            return ["Result"=>"Error"];
+        }
     }
 
     /**
@@ -66,9 +82,19 @@ class CategoryHardDiskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, CategoryHardDisk $category_harddisk_id)
     {
-        //
+        $categoryharddisk = CategoryHardDisk::find($request->category_harddisk_id);
+        $categoryharddisk->category_harddisk_name=$request->category_harddisk_name;
+        $result = $categoryharddisk->save();
+        if( $result)
+        {
+            return ["Result"=>"Data has been saved"];
+        }
+        else
+        {
+            return ["Result"=>"Error"];
+        }
     }
 
     /**
@@ -77,8 +103,18 @@ class CategoryHardDiskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, CategoryHardDisk $category_harddisk_id)
     {
-        //
+        $categoryharddisk = CategoryHardDisk::find($request->category_harddisk_id);
+        $categoryharddisk->deleted_at=$request->Carbon::now();
+        $result = $categoryharddisk->save();
+        if( $result)
+        {
+            return ["Result"=>"Data has been saved"];
+        }
+        else
+        {
+            return ["Result"=>"Error"];
+        }
     }
 }
