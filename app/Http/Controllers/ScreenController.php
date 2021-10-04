@@ -7,6 +7,9 @@ use App\Models\Screen;
 use App\Models\CategoryScreen;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\ulitilize\UUID;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 
 class ScreenController extends Controller
@@ -49,26 +52,24 @@ class ScreenController extends Controller
                 }),
             ]
         );
-        $validator = Validator::make($request->all(),$rules);
-        if($validator->fails())
+        
+        foreach($request->all() as $item)
         {
-            return $validator->errors();
-        }
-        else
-        {
-            $screen = new Screen;
-            $screen->screen_id='screen'.time();
-            $screen->category_screen_id=$request->category_screen_id;
-            $screen->screen_detail=$request->screen_detail;
-
-            $result = $screen->save();
-            if( $result)
+            $validator = Validator::make($item,$rules);
+            
+            if($validator->fails())
             {
-                return ["Result"=>"Data has been saved"];
+                return $validator->errors();
             }
             else
             {
-                return ["Result"=>"Error"];
+                $screen = new Screen;
+                $screen_id = new UUID();
+                $screen->screen_id=$screen->get_uuid();
+                $screen->category_screen_id=$item['category_screen_id'];
+                $screen->screen_detail=$item['screen_detail'];
+
+                $result = $screen->save();
             }
         }
     }
@@ -102,11 +103,10 @@ class ScreenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Screen $screen)
+    public function update(Request $request, $screen)
     {
         $rules = array(
             "category_screen_id"=>[
-                'required',
                 Rule::exists('tbl_categoryscreen')->where(function ($query) {
                     $query->get('category_screen_id');
                 }),
@@ -119,11 +119,8 @@ class ScreenController extends Controller
         }
         else
         {
-            $screen = Screen::find($request->screen_id);
-            $screen->category_screen_id=$request->category_screen_id;
-            $screen->screen_detail=$request->screen_detail;
-
-            $result = $screen->save();
+            $screen =  Screen::where('screen_id',$screen_id);
+            $result = $screen->update($request->all());
             if( $result)
             {
                 return ["Result"=>"Data has been saved"];
@@ -141,19 +138,25 @@ class ScreenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, Screen $screen)
+    public function destroy(Request $request,  $screen_id)
     {
-        $screen = Screen::find($request->screen_id);
-            $screen->deleted_at=$request->Carbon::now();
-
-            $result = $screen->save();
-            if( $result)
-            {
-                return ["Result"=>"Data has been saved"];
-            }
-            else
-            {
-                return ["Result"=>"Error"];
-            }
+        
+       
+        if (Screen::where('screen_id', $screen_id)->exists()) {
+            $screen = Screen::find($screen_id);
+    
+            if($screen->deleted_at != NULL) return ["Result" => "Screen deleted"];
+            $screen->deleted_at = Carbon::now();
+            $screen->save();
+    
+            return response()->json([
+              "message" => "records deleted successfully"
+            ], 200);
+          } else {
+            return response()->json([
+              "message" => "Book not found"
+            ], 404);
+          }
+         
     }
 }

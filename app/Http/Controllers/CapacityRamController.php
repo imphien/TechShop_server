@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\CapacityRam;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\ulitilize\UUID;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\CapacityRamResource;
 
 class CapacityRamController extends Controller
 {
@@ -39,18 +43,15 @@ class CapacityRamController extends Controller
      */
     public function store(Request $request)
     {
+       foreach($request->all() as $item)
+       {
         $capacityram = new CapacityRam;
-        $capacityram->capacity_ram_id='capacity_ram'.time();
-        $capacityram->capacity_ram=$request->capacity_ram;
+        $capacity_ram_id = new UUID();
+        $capacityram->capacity_ram_id = $capacity_ram_id->gen_uuid();
+        $capacityram->capacity_ram=$item['capacity_ram'];
         $result = $capacityram->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been saved"];
-        }
-        else
-        {
-            return ["Result"=>"Error"];
-        }
+       
+       }
     }
 
     /**
@@ -82,11 +83,10 @@ class CapacityRamController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CapacityRam $capacity_ram_id)
+    public function update(Request $request,  $capacity_ram_id)
     {
-        $capacityram =  CapacityRam::find($request->capacity_ram_id);
-        $capacityram->capacity_ram=$request->capacity_ram;
-        $result = $capacityram->save();
+        $capacity_ram =  CapacityRAM::where('capacity_ram_id',$capacity_ram_id);
+        $result = $capacity_ram->update($request->all());
         if( $result)
         {
             return ["Result"=>"Data has been saved"];
@@ -103,18 +103,22 @@ class CapacityRamController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, CapacityRam $capacity_ram_id)
+    public function destroy(Request $request,  $capacity_ram_id)
     {
-        $capacityram =  CapacityRam::find($request->capacity_ram_id);
-        $capacityram->deleted_at= Carbon::now();
-        $result = $capacityram->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been saved"];
-        }
-        else
-        {
-            return ["Result"=>"Error"];
-        }
+        if (CapacityRam::where('capacity_ram_id',$capacity_ram_id)->exists()) {
+            $capacity_ram = CapacityRam::find($capacity_ram_id);
+            if($capacity_ram->deleted_at != NULL) return ["Result" => "CapacityRam deleted"];
+            $capacity_ram->deleted_at = Carbon::now();
+            $capacity_ram->save();
+    
+            return response()->json([
+              "message" => "Deleted successfully"
+            ], 200);
+          }
+        else {
+            return response()->json([
+              "message" => "Error"
+            ], 404);
+          }
     }
 }

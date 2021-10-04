@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Screen extends Model
 {
     protected $table = "tbl_screen";
-
+    protected $primaryKey = "screen_id";
     public function product()
     {
         return $this->hasMany('App\Models\Product','screen_id','screen_id');

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class HardDisk extends Model
 {
     protected $table = "tbl_harddisk";
+    protected $primaryKey = "harddisk_id";
 
     public function product()
     {

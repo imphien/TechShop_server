@@ -7,6 +7,9 @@ use App\Models\HardDisk;
 use App\Models\CategoryHardDisk;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\ulitilize\UUID;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class HardDiskController extends Controller
 {
@@ -48,26 +51,20 @@ class HardDiskController extends Controller
                 }),
             ]
         );
-        $validator = Validator::make($request->all(),$rules);
-        if($validator->fails())
+        foreach($request->all() as $item)
         {
-            return $validator->errors();
-        }
-        else
-        {
-            $harddisk = new HardDisk;
-            $harddisk->harddisk_id='harddisk'.time();
-            $harddisk->category_harddisk_id=$request->category_harddisk_id;
-            $harddisk->capacity_harddisk=$request->capacity_harddisk;
-
-            $result = $harddisk->save();
-            if( $result)
+            $validator = Validator::make($item,$rules);
+            if($validator->fails())
             {
-                return ["Result"=>"Data has been saved"];
-            }
-            else
+                return $validator->errors();
+            }else
             {
-                return ["Result"=>"Error"];
+                $harddisk = new HardDisk;
+                $harddisk_id = new UUID();
+                $harddisk->harddisk_id = $harddisk_id->gen_uuid();
+                $harddisk->category_harddisk_id=$item['category_harddisk_id'];
+                $harddisk->capacity_harddisk=$item['capacity_harddisk'];
+                $result = $harddisk->save();
             }
         }
     }
@@ -101,11 +98,10 @@ class HardDiskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, HardDisk $harddisk_id)
+    public function update(Request $request,  $harddisk_id)
     {
         $rules = array(
             "category_harddisk_id"=>[
-                'required',
                 Rule::exists('tbl_categoryharddisk')->where(function ($query) {
                     $query->get('category_harddisk_id');
                 }),
@@ -118,11 +114,8 @@ class HardDiskController extends Controller
         }
         else
         {
-            $harddisk = HardDisk::find($request->harddisk_id);
-            $harddisk->category_harddisk_id=$request->category_harddisk_id;
-            $harddisk->capacity_harddisk=$request->capacity_harddisk;
-
-            $result = $harddisk->save();
+            $harddisk =  HardDisk::where('harddisk_id',$harddisk_id);
+            $result = $harddisk->update($request->all());
             if( $result)
             {
                 return ["Result"=>"Data has been saved"];
@@ -140,19 +133,22 @@ class HardDiskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, HardDisk $harddisk_id)
+    public function destroy(Request $request,  $harddisk_id)
     {
-        $harddisk = HardDisk::find($request->harddisk_id);
-        $harddisk->deleted_at=$request->Carbon::now();
-
-        $result = $harddisk->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been saved"];
-        }
-        else
-        {
-            return ["Result"=>"Error"];
-        }
+        if (HardDisk::where('harddisk_id',$harddisk_id)->exists()) {
+            $harddisk= HardDisk::find($harddisk_id);
+            if($harddisk->deleted_at != NULL) return ["Result" => "Harddisk deleted"];
+            $harddisk->deleted_at = Carbon::now();
+            $harddisk->save();
+    
+            return response()->json([
+              "message" => "Deleted successfully"
+            ], 200);
+          }
+        else {
+            return response()->json([
+              "message" => "Error"
+            ], 404);
+          }
     }
 }

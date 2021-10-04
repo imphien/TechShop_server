@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\CategoryCPU;
+use App\Models\CategoryCPU;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\ulitilize\UUID;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryCPUController extends Controller
 {
@@ -39,18 +42,15 @@ class CategoryCPUController extends Controller
      */
     public function store(Request $request, CategoryCPU $category_cpu_id)
     {
-        $categorycpu = new CategoryCPU;
-            $categorycpu->category_cpu_id='category_cpu'.time();
-            $categorycpu->category_cpu_name=$request->category_cpu_name;
+        foreach($request->all() as $item)
+        {
+            $categorycpu = new CategoryCPU;
+            $category_cpu_id = new UUID();
+            $categorycpu->category_cpu_id = $category_cpu_id->gen_uuid();
+            $categorycpu->category_cpu_name=$item['category_cpu_name'];
             $result = $categorycpu->save();
-            if( $result)
-            {
-                return ["Result"=>"Data has been saved"];
-            }
-            else
-            {
-                return ["Result"=>"Error"];
-            }
+            
+        }
     }
 
     /**
@@ -82,32 +82,10 @@ class CategoryCPUController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CategoryCPU $category_cpu_id)
+    public function update(Request $request,  $category_cpu_id)
     {
-        $categorycpu = CategoryCPU::find($request->category_cpu_id);
-            $categorycpu->category_cpu_name=$request->category_cpu_name;
-            $result = $categorycpu->save();
-            if( $result)
-            {
-                return ["Result"=>"Data has been saved"];
-            }
-            else
-            {
-                return ["Result"=>"Error"];
-            }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Request $request, CategoryCPU $category_cpu_id)
-    {
-        $categorycpu = CategoryCPU::find($request->category_cpu_id);
-        $categorycpu->deleted_at=Carbon::now();
-        $result = $categorycpu->save();
+        $category_cpu =  CategoryCPU::where('category_cpu_id',$category_cpu_id);
+        $result = $category_cpu->update($request->all());
         if( $result)
         {
             return ["Result"=>"Data has been saved"];
@@ -116,5 +94,30 @@ class CategoryCPUController extends Controller
         {
             return ["Result"=>"Error"];
         }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request, $category_cpu_id)
+    {
+        if (CategoryCPU::where('category_cpu_id',$category_cpu_id)->exists()) {
+            $category_cpu= CategoryCPU::find($category_cpu_id);
+            if($category_cpu->deleted_at != NULL) return ["Result" => "CapacityRam deleted"];
+            $category_cpu->deleted_at = Carbon::now();
+            $category_cpu->save();
+    
+            return response()->json([
+              "message" => "Deleted successfully"
+            ], 200);
+          }
+        else {
+            return response()->json([
+              "message" => "Error"
+            ], 404);
+          }
     }
 }

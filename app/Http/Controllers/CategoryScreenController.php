@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\CategoryScreen;
+use App\Models\CategoryScreen;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\ulitilize\UUID;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryScreenController extends Controller
 {
@@ -39,17 +42,13 @@ class CategoryScreenController extends Controller
      */
     public function store(Request $request)
     {
+        foreach($request->all() as $item)
+        {
         $categoryscreen = new CategoryScreen;
-        $categoryscreen->category_screen_id='category_screen'.time();
-        $categoryscreen->screen_size=$request->screen_size;
+        $category_screen_id = new UUID();
+        $categoryscreen->category_screen_id = $category_screen_id->gen_uuid();
+        $categoryscreen->screen_size=$item['screen_size'];
         $result = $categoryscreen->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been saved"];
-        }
-        else
-        {
-            return ["Result"=>"Error"];
         }
     }
 
@@ -82,11 +81,10 @@ class CategoryScreenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,CategoryScreen $category_screen_id)
+    public function update(Request $request, $category_screen_id)
     {
-        $categoryscreen = CategoryScreen::find($request->category_screen_id);
-        $categoryscreen->screen_size=$request->screen_size;
-        $result = $categoryscreen->save();
+        $category_screen =  CategoryScreen::where('category_screen_id',$category_screen_id);
+        $result = $category_screen->update($request->all());
         if( $result)
         {
             return ["Result"=>"Data has been saved"];
@@ -103,18 +101,22 @@ class CategoryScreenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request,CategoryScreen $category_screen_id)
+    public function destroy(Request $request, $category_screen_id)
     {
-        $categoryscreen = CategoryScreen::find($request->category_screen_id);
-        $categoryscreen->deleted_at=Carbon::now();
-        $result = $categoryscreen->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been saved"];
-        }
-        else
-        {
-            return ["Result"=>"Error"];
-        }
+        if (CategoryScreen::where('category_screen_id',$category_screen_id)->exists()) {
+            $category_screen= CategoryScreen::find($category_screen_id);
+            if($category_screen->deleted_at != NULL) return ["Result" => "Category_screen deleted"];
+            $category_screen->deleted_at = Carbon::now();
+            $category_screen->save();
+    
+            return response()->json([
+              "message" => "Deleted successfully"
+            ], 200);
+          }
+        else {
+            return response()->json([
+              "message" => "Error"
+            ], 404);
+          }
     }
 }
