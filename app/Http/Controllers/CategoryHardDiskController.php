@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\CategoryHardDisk;
+use App\Models\CategoryHardDisk;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\ulitilize\UUID;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryHardDiskController extends Controller
 {
@@ -39,17 +42,14 @@ class CategoryHardDiskController extends Controller
      */
     public function store(Request $request)
     {
+        foreach($request->all() as $item)
+        {
         $categoryharddisk = new CategoryHardDisk;
-        $categoryharddisk->category_harddisk_id='category_harddisk'.time();
-        $categoryharddisk->category_harddisk_name=$request->category_harddisk_name;
+        $category_harddisk_id = new UUID();
+        $categoryharddisk->category_harddisk_id = $category_harddisk_id->gen_uuid();
+        $categoryharddisk->category_harddisk_name=$item['category_harddisk_name'];
         $result = $categoryharddisk->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been saved"];
-        }
-        else
-        {
-            return ["Result"=>"Error"];
+       
         }
     }
 
@@ -82,11 +82,10 @@ class CategoryHardDiskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CategoryHardDisk $category_harddisk_id)
+    public function update(Request $request,  $category_harddisk_id)
     {
-        $categoryharddisk = CategoryHardDisk::find($request->category_harddisk_id);
-        $categoryharddisk->category_harddisk_name=$request->category_harddisk_name;
-        $result = $categoryharddisk->save();
+        $category_harddisk =  CategoryHardDisk::where('category_harddisk_id',$category_harddisk_id);
+        $result = $category_harddisk->update($request->all());
         if( $result)
         {
             return ["Result"=>"Data has been saved"];
@@ -103,18 +102,22 @@ class CategoryHardDiskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, CategoryHardDisk $category_harddisk_id)
+    public function destroy(Request $request, $category_harddisk_id)
     {
-        $categoryharddisk = CategoryHardDisk::find($request->category_harddisk_id);
-        $categoryharddisk->deleted_at=$request->Carbon::now();
-        $result = $categoryharddisk->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been saved"];
-        }
-        else
-        {
-            return ["Result"=>"Error"];
-        }
+        if (CategoryHardDisk::where('category_harddisk_id',$category_harddisk_id)->exists()) {
+            $category_harddisk= CategoryHardDisk::find($category_harddisk_id);
+            if($category_harddisk->deleted_at != NULL) return ["Result" => "Category_harddisk deleted"];
+            $category_harddisk->deleted_at = Carbon::now();
+            $category_harddisk->save();
+    
+            return response()->json([
+              "message" => "Deleted successfully"
+            ], 200);
+          }
+        else {
+            return response()->json([
+              "message" => "Error"
+            ], 404);
+          }
     }
 }

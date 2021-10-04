@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryScreen extends Model
 {
     protected $table = "tbl_categoryscreen";
+    protected $primaryKey = "category_screen_id";
 
     public function screen()
     {

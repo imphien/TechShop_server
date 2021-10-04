@@ -7,6 +7,10 @@ use App\Models\CPU;
 use App\Models\CategoryCPU;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\ulitilize\UUID;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
+
 
 class CPUController extends Controller
 {
@@ -49,28 +53,34 @@ class CPUController extends Controller
                 }),
             ]
         );
-        $validator = Validator::make($request->all(),$rules);
-        if($validator->fails())
+        //$validator = Validator::make($request->all(),$rules);
+        foreach($request->all() as $item)
         {
-            return $validator->errors();
-        }
-        else
-        {
-            $cpu = new CPU;
-            $cpu->cpu_id='cpu'.time();
-            $cpu->category_cpu_id=$request->category_cpu_id;
-            $cpu->cpu_name=$request->cpu_name;
+            $validator = Validator::make($item,$rules);
 
-            $result = $cpu->save();
-            if( $result)
+            if(!$validator->fails())
             {
-                return ["Result"=>"Data has been saved"];
+                try
+                {
+                    $cpu = new CPU;
+                    $cpu_id = new UUID();
+                    $cpu->cpu_id = $cpu_id->gen_uuid();
+                    $cpu->category_cpu_id=$item['category_cpu_id'];
+                    $cpu->cpu_name=$item['cpu_name'];
+        
+                    $result = $cpu->save();
+                }
+                catch(Exception $e)
+                {
+
+                }
             }
             else
             {
-                return ["Result"=>"Error"];
+                return $validator->errors();
             }
         }
+        
     }
 
     /**
@@ -102,11 +112,10 @@ class CPUController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CPU $cpu_id)
+    public function update(Request $request,  $cpu_id)
     {
         $rules = array(
             "category_cpu_id"=>[
-                'required',
                 Rule::exists('tbl_categorycpu')->where(function ($query) {
                     $query->get('category_cpu_id');
                 }),
@@ -119,11 +128,8 @@ class CPUController extends Controller
         }
         else
         {
-            $cpu = CPU::find($request->cpu_id);
-            $cpu->category_cpu_id=$request->category_cpu_id;
-            $cpu->cpu_name=$request->cpu_name;
-
-            $result = $cpu->save();
+            $cpu =  CPU::where('cpu_id',$cpu_id);
+            $result = $cpu->update($request->all());
             if( $result)
             {
                 return ["Result"=>"Data has been saved"];
@@ -141,18 +147,22 @@ class CPUController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, CPU $cpu_id)
+    public function destroy(Request $request,  $cpu_id)
     {
-        $cpu = CPU::find($request->cpu_id);
-            $cpu->deleted_at=Carbon::now();
-            $result = $cpu->save();
-            if( $result)
-            {
-                return ["Result"=>"Data has been saved"];
-            }
-            else
-            {
-                return ["Result"=>"Error"];
-            }
+        if (CPU::where('cpu_id',$cpu_id)->exists()) {
+            $cpu= CPU::find($cpu_id);
+            if($cpu->deleted_at != NULL) return ["Result" => "CPU deleted"];
+            $cpu->deleted_at = Carbon::now();
+            $cpu->save();
+    
+            return response()->json([
+              "message" => "Deleted successfully"
+            ], 200);
+          }
+        else {
+            return response()->json([
+              "message" => "Error"
+            ], 404);
+          }
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class ImagesProduct extends Model
 {
     protected $table = "tbl_imagesproduct";
+    protected $primaryKey = "image_id";
 
     public function product()
     {

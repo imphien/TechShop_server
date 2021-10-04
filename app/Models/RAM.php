@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class RAM extends Model
 {
     protected $table = "tbl_ram";
+    protected $primaryKey = "ram_id";
 
     public function product()
     {

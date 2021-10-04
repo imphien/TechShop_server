@@ -3,9 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\CategoryCard;
+use App\Models\CategoryCard;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\ulitilize\UUID;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\CategoryCardResource;
+
+
 
 class CategoryCardController extends Controller
 {
@@ -39,18 +45,14 @@ class CategoryCardController extends Controller
      */
     public function store(Request $request)
     {
-        $categorycard = new CategoryCard;
-            $categorycard->category_card_id='category_card'.time();
-            $categorycard->category_card_name=$request->category_card_name;
+        foreach($request->all() as $item)
+        {
+            $categorycard = new CategoryCard();
+            $category_card_id = new UUID();
+            $categorycard->category_card_id= $category_card_id->gen_uuid();
+            $categorycard->category_card_name=$item['category_card_name'];
             $result = $categorycard->save();
-            if( $result)
-            {
-                return ["Result"=>"Data has been saved"];
-            }
-            else
-            {
-                return ["Result"=>"Error"];
-            }
+        }
     }
 
     /**
@@ -82,11 +84,10 @@ class CategoryCardController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CategoryCard $category_card_id)
+    public function update(Request $request,  $category_card_id)
     {
-        $categorycard = CategoryCard::find($request->category_card_id);
-        $categorycard->category_card_name=$request->category_card_name;
-        $result = $categorycard->save();
+        $category_card =  CategoryCard::where('category_card_id',$category_card_id);
+        $result = $category_card->update($request->all());
         if( $result)
         {
             return ["Result"=>"Data has been saved"];
@@ -103,18 +104,21 @@ class CategoryCardController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, CategoryCard $category_card_id)
+    public function destroy(Request $request, $category_card_id)
     {
-        $categorycard = CategoryCard::find($request->category_card_id);
-        $categorycard->deleted_at=Carbon::now();
-        $result = $categorycard->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been saved"];
-        }
-        else
-        {
-            return ["Result"=>"Error"];
-        }
+        if (CategoryCard::where('category_card_id',$category_card_id)->exists()) {
+            $categorycard = CategoryCard::find($category_card_id);
+            if($categorycard->deleted_at != NULL) return ["Result" => "Đã xóa rồi"];
+            $categorycard->deleted_at = Carbon::now();
+            $categorycard->save();
+    
+            return response()->json([
+              "message" => "records updated successfully"
+            ], 200);
+          } else {
+            return response()->json([
+              "message" => "Book not found"
+            ], 404);
+          }
     }
 }

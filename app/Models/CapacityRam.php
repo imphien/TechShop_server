@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CapacityRam extends Model
 {
     protected $table = "tbl_capacityram";
+    protected $primaryKey = "capacity_ram_id";
 
     public function ram()
     {

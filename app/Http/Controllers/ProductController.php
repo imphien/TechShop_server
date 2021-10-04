@@ -12,13 +12,14 @@ use App\Models\Screen;
 use App\Models\Card;
 use App\Models\MachineSeries;
 use App\Models\ImageProduct;
-use App\Http\Resources\ProdcutResource;
+use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductCollection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Validator;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
+use App\ulitilize\UUID;
 
 
 
@@ -63,10 +64,31 @@ class ProductController extends Controller
                                     ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
                                     ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
                                     ->whereNotNull('tbl_product.deleted_at')
-                                    ->select('product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
+                                    ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
                                     'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
-                                    ->orderBy('tbl_product.product_id')
-                                    ->simplePaginate(10);;
+                                    ->get()->toArray();
+        $array_product_deleted = array_column($product_deleted,'product_id'); 
+         $url = DB::table('tbl_imagesproduct')
+                ->whereIn('product_id',$array_product_deleted)
+                ->select('url','product_id')
+                ->get()->toArray();
+         $array_images = [];
+        foreach($url as $value)
+            {
+               $array_images[$value->product_id][] = $value->url;
+            }
+        foreach($product_deleted as $key=>$pr)
+            {
+                if(isset($array_images[$pr->product_id]) )
+                    {
+                       
+                        $product_deleted[$key]->images = $array_images[$pr->product_id];
+                    }
+                else
+                    {
+                        $product_deleted[$key]->images =[];
+                    }
+                }
         return $product_deleted;
     }
 
@@ -81,11 +103,33 @@ class ProductController extends Controller
                                     ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
                                     ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
                                     ->whereNull('tbl_product.deleted_at')
-                                    ->select('product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
+                                    ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
                                     'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
-                                    ->simplePaginate(10);
-                                    
+                                    ->get()->toArray();
+        $array_product_not_delete = array_column($product_not_deleted,'product_id'); 
+         $url = DB::table('tbl_imagesproduct')
+                ->whereIn('product_id',$array_product_not_delete)
+                ->select('url','product_id')
+                ->get()->toArray();
+         $array_images = [];
+        foreach($url as $value)
+            {
+               $array_images[$value->product_id][] = $value->url;
+            }
+        foreach($product_not_deleted as $key=>$pr)
+            {
+                if(isset($array_images[$pr->product_id]) )
+                    {
+                       
+                        $product_not_deleted[$key]->images = $array_images[$pr->product_id];
+                    }
+                else
+                    {
+                        $product_not_deleted[$key]->images =[];
+                    }
+                }
         return $product_not_deleted;
+                                    
     }
 
     public function get_product_detail()
@@ -198,39 +242,34 @@ class ProductController extends Controller
             "discount" => 'required|numeric',
             "product_detail" => 'required'
         );
-        $validator = Validator::make($request->all(),$rules);
-        if($validator->fails())
+       
+        foreach($request->all() as $item)
         {
-            return $validator->errors();
-        }
-        else
-        {
-            $product = new Product;
-            $product->product_id='product'.time();
-            $product->product_name=$request->product_name;
-            $product->cpu_id=$request->cpu_id;
-            $product->harddisk_id=$request->harddisk_id;
-            $product->brand_id=$request->brand_id;
-            $product->ram_id=$request->ram_id;
-            $product->screen_id=$request->screen_id;
-            $product->card_id=$request->card_id;
-            $product->class_id=$request->class_id;
-            $product->mass=$request->mass;
-            $product->size=$request->size;
-            $product->camera=$request->camera;
-            $product->price=$request->price;
-            $product->discount=$request->discount;
-            $product->product_detail=$request->product_detail;
-
-            $result = $product->save();
-            $this->save_image($product->product_id);
-            if( $result)
+            $validator = Validator::make($item,$rules);
+            if($validator->fails())
             {
-                return ["Result"=>"Data has been saved"];
+                return $validator->errors();
             }
-            else
-            {
-                return ["Result"=>"Error"];
+            else{
+                $product = new Product;
+                $product_id = new UUID();
+                $product->product_id = $product_id->get_uuid();
+                $product->product_name=$item['product_name'];
+                $product->cpu_id=$item['cpu_id'];
+                $product->harddisk_id=$item['harddisk_id'];
+                $product->brand_id=$item['brand_id'];
+                $product->ram_id=$item['ram_id'];
+                $product->screen_id=$item['screen_id'];
+                $product->card_id=$item['card_id'];
+                $product->class_id=$item['class_id'];
+                $product->mass=$item['mass'];
+                $product->size=$item['size'];
+                $product->camera=$item['camera'];
+                $product->price=$item['price'];
+                $product->discount=$item['discount'];
+                $product->product_detail=$item['product_detail'];
+
+                $result = $product->save();
             }
         }
     }
@@ -241,9 +280,29 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show( $product_id)
     {
-        
+
+        if (Product::where('product_id',$product_id)->exists()) {
+            $product = Product::find($product_id)
+                        ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
+                        ->join('tbl_harddisk','tbl_harddisk.harddisk_id','=','tbl_product.harddisk_id')
+                        ->join('tbl_brand','tbl_brand.brand_id','=','tbl_product.brand_id')
+                        ->join('tbl_ram','tbl_ram.ram_id','=','tbl_product.ram_id')
+                        ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
+                        ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
+                        ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
+                        ->whereNotNull('tbl_product.deleted_at')
+                        ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
+                        'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
+                        ->get();
+            return $product;
+          }
+        else {
+            return response()->json([
+              "message" => "Error"
+            ], 404);
+          }
     }
 
     /**
@@ -264,7 +323,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,Product $product_id)
+    public function update(Request $request, $product_id)
     {
         $rules = array(
             "cpu_id"=>[
@@ -313,22 +372,8 @@ class ProductController extends Controller
         }
         else
         {
-            $product = Product::find($request->product_id);
-            $product->product_name=$request->product_name;
-            $product->cpu_id=$request->cpu_id;
-            $product->harddisk_id=$request->harddisk_id;
-            $product->brand_id=$request->brand_id;
-            $product->ram_id=$request->ram_id;
-            $product->screen_id=$request->screen_id;
-            $product->card_id=$request->card_id;
-            $product->class_id=$request->class_id;
-            $product->mass=$request->mass;
-            $product->size=$request->size;
-            $product->camera=$request->camera;
-            $product->price=$request->price;
-            $product->discount=$request->discount;
-            $product->product_detail=$request->product_detail;
-            $result = $product->save();
+            $product =  Product::where('product_id',$product_id);
+            $result = $product->update($request->all());
             if( $result)
             {
                 return ["Result"=>"Data has been saved"];
@@ -346,17 +391,22 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request,Product $product_id)
+    public function destroy(Request $request, $product_id)
     {
-        $product = Product::find($request->product_id);
-        $product->deleted_at= Carbon::now();
-        $result = $product->save();
-        if( $result)
-        {
-            return ["Result"=>"Data has been delete"];
-        }else
-        {
-            return ["Result"=>"Error"];
-        }
+        if (Product::where('product_id',$product_id)->exists()) {
+            $product= Product::find($product_id);
+            if($product->deleted_at != NULL) return ["Result" => "Product deleted"];
+            $product->deleted_at = Carbon::now();
+            $product->save();
+    
+            return response()->json([
+              "message" => "Deleted successfully"
+            ], 200);
+          }
+        else {
+            return response()->json([
+              "message" => "Error"
+            ], 404);
+          }
     }
 }

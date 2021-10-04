@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryCard extends Model
 {
     protected $table = "tbl_categorycard";
+    protected $primaryKey = "category_card_id";
 
     public function card()
     {

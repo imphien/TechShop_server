@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class CategoryHardDisk extends Model
 {
     protected $table = "tbl_categoryharddisk";
+    protected $primaryKey = "category_harddisk_id";
 
     public function harddisk()
     {
