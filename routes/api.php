@@ -64,8 +64,11 @@ Route::get("/ram",[App\Http\Controllers\RAMController::class,'index']);
  
  Route::get("/uuid",[App\Http\Controllers\BrandController::class,'gen_uuid']);
 
+//search
 
-//  Route::resource('/ram', App\Http\Controllers\RAMController::class);
+Route::get("/search",[App\Http\Controllers\SearchController::class,'search']);
+
+
 //Protected route
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post("/logout",[App\Http\Controllers\AuthController::class,'logout']);
