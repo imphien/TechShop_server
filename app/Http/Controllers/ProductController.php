@@ -11,7 +11,7 @@ use App\Models\RAM;
 use App\Models\Screen;
 use App\Models\Card;
 use App\Models\MachineSeries;
-use App\Models\ImageProduct;
+use App\Models\ImagesProduct;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductCollection;
 use Illuminate\Support\Facades\DB;
@@ -267,7 +267,6 @@ class ProductController extends Controller
             "discount" => 'required|numeric',
             "product_detail" => 'required'
         );
-       $array_product_id = [];
         foreach($request->all() as $item)
         {
             $validator = Validator::make($item,$rules);
@@ -281,7 +280,6 @@ class ProductController extends Controller
 
                 $product_id = new UUID();
                 $temp = $product_id->gen_uuid() ;
-                $array_product_id[] = $temp;
                 $product->product_id = $temp;
                 $product->product_name=$item['product_name'];
                 $product->cpu_id=$item['cpu_id'];
@@ -297,13 +295,22 @@ class ProductController extends Controller
                 $product->price=$item['price'];
                 $product->discount=$item['discount'];
                 $product->product_detail=$item['product_detail'];
-            
-                $result = $product->save();
+                
+                $product->save();
+
+                foreach($item['images'] as $img)
+                {
+                    $image = new ImagesProduct();
+                    $image_id = new UUID();
+                    $image->image_id = $image_id->gen_uuid();
+                    $image->product_id = $temp;
+                    $image->url = $img['url'];
+                    $image->save();
+                }
                 
             }
             
         }
-        return $array_product_id;
     }
 
     /**

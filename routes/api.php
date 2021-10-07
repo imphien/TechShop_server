@@ -138,4 +138,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post("/harddisk",[App\Http\Controllers\HardDiskController::class,'store']);
     Route::put("/harddisk/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'update']);
     Route::put("/delete_harddisk/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'destroy']);
+
+    //Order Detail
+    Route::post("/orderdetail",[App\Http\Controllers\OrderDetailController::class,'store']);
+
+    //Order
+    Route::post("/order",[App\Http\Controllers\OrderController::class,'store']);
 });

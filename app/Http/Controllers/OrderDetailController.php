@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\Order;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
+use App\Models\OrderDetail;
 
 class OrderDetailController extends Controller
 {
@@ -32,9 +38,9 @@ class OrderDetailController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, )
     {
-        //
+       
     }
 
     /**
