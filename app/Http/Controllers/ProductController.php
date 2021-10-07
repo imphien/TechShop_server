@@ -33,15 +33,40 @@ class ProductController extends Controller
      */
     public function index(Product $product)
     {
-        // $product = DB::table('tbl_product')
-        //             ->simplePaginate(10);
-        //         return $product;
-        // $data = $product->toArray();
-        // $data['image_product'] = $product->image_product()->take(5)-toArray();
-        $product = Product::with('image_product')
-                    ->get();
-         $product['image_product'] = DB::table('tbl_imagesproduct') -> get();
-        return response()->json($product,200);
+        $product = DB::table('tbl_product')
+                                    ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
+                                    ->join('tbl_harddisk','tbl_harddisk.harddisk_id','=','tbl_product.harddisk_id')
+                                    ->join('tbl_brand','tbl_brand.brand_id','=','tbl_product.brand_id')
+                                    ->join('tbl_ram','tbl_ram.ram_id','=','tbl_product.ram_id')
+                                    ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
+                                    ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
+                                    ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
+                                    ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
+                                    'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
+                                    ->get()->toArray();
+        $array_product = array_column($product,'product_id'); 
+         $url = DB::table('tbl_imagesproduct')
+                ->whereIn('product_id',$array_product)
+                ->select('url','product_id')
+                ->get()->toArray();
+         $array_images = [];
+        foreach($url as $value)
+            {
+               $array_images[$value->product_id][] = $value->url;
+            }
+        foreach($product as $key=>$pr)
+            {
+                if(isset($array_images[$pr->product_id]) )
+                    {
+                       
+                        $product[$key]->images = $array_images[$pr->product_id];
+                    }
+                else
+                    {
+                        $product[$key]->images =[];
+                    }
+                }
+        return $product;
 
 
 
@@ -242,7 +267,7 @@ class ProductController extends Controller
             "discount" => 'required|numeric',
             "product_detail" => 'required'
         );
-       
+       $array_product_id = [];
         foreach($request->all() as $item)
         {
             $validator = Validator::make($item,$rules);
@@ -251,9 +276,13 @@ class ProductController extends Controller
                 return $validator->errors();
             }
             else{
+                
                 $product = new Product;
+
                 $product_id = new UUID();
-                $product->product_id = $product_id->get_uuid();
+                $temp = $product_id->gen_uuid() ;
+                $array_product_id[] = $temp;
+                $product->product_id = $temp;
                 $product->product_name=$item['product_name'];
                 $product->cpu_id=$item['cpu_id'];
                 $product->harddisk_id=$item['harddisk_id'];
@@ -268,10 +297,13 @@ class ProductController extends Controller
                 $product->price=$item['price'];
                 $product->discount=$item['discount'];
                 $product->product_detail=$item['product_detail'];
-
+            
                 $result = $product->save();
+                
             }
+            
         }
+        return $array_product_id;
     }
 
     /**
@@ -280,7 +312,7 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show( $product_id)
+    public function show(Product $product_id)
     {
 
         if (Product::where('product_id',$product_id)->exists()) {
@@ -376,7 +408,7 @@ class ProductController extends Controller
             $result = $product->update($request->all());
             if( $result)
             {
-                return ["Result"=>"Data has been saved"];
+                return ["product_id"=>"Data has been saved"];
             }
             else
             {
