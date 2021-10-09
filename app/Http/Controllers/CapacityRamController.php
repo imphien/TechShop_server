@@ -10,6 +10,7 @@ use App\ulitilize\UUID;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\CapacityRamResource;
+use Illuminate\Http\Response;
 
 class CapacityRamController extends Controller
 {
@@ -89,11 +90,15 @@ class CapacityRamController extends Controller
         $result = $capacity_ram->update($request->all());
         if( $result)
         {
-            return ["Result"=>"Data has been saved"];
+            return response()->json([
+                "message" => "Data has been saved"
+              ], 200);
         }
         else
         {
-            return ["Result"=>"Error"];
+            return response()->json([
+                "message" => "Error"
+              ], 404);
         }
     }
 

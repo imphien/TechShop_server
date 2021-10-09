@@ -20,6 +20,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\ulitilize\UUID;
+use Illuminate\Http\Response;
 
 
 
@@ -272,7 +273,7 @@ class ProductController extends Controller
             $validator = Validator::make($item,$rules);
             if($validator->fails())
             {
-                return $validator->errors();
+                return response()->json( $validator->errors(),404);
             }
             else{
                 
@@ -296,7 +297,7 @@ class ProductController extends Controller
                 $product->discount=$item['discount'];
                 $product->product_detail=$item['product_detail'];
                 
-                $product->save();
+                $result = $product->save();
 
                 foreach($item['images'] as $img)
                 {
@@ -307,10 +308,10 @@ class ProductController extends Controller
                     $image->url = $img['url'];
                     $image->save();
                 }
-                
             }
             
         }
+      
     }
 
     /**
@@ -321,27 +322,8 @@ class ProductController extends Controller
      */
     public function show(Product $product_id)
     {
-
-        if (Product::where('product_id',$product_id)->exists()) {
-            $product = Product::find($product_id)
-                        ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
-                        ->join('tbl_harddisk','tbl_harddisk.harddisk_id','=','tbl_product.harddisk_id')
-                        ->join('tbl_brand','tbl_brand.brand_id','=','tbl_product.brand_id')
-                        ->join('tbl_ram','tbl_ram.ram_id','=','tbl_product.ram_id')
-                        ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
-                        ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
-                        ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
-                        ->whereNotNull('tbl_product.deleted_at')
-                        ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
-                        'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
-                        ->get();
-            return $product;
-          }
-        else {
-            return response()->json([
-              "message" => "Error"
-            ], 404);
-          }
+        
+       
     }
 
     /**
@@ -407,7 +389,7 @@ class ProductController extends Controller
         $validator = Validator::make($request->all(),$rules);
         if($validator->fails())
         {
-            return $validator->errors();
+            return response()->json($validator->errors(),404);
         }
         else
         {
@@ -415,11 +397,15 @@ class ProductController extends Controller
             $result = $product->update($request->all());
             if( $result)
             {
-                return ["product_id"=>"Data has been saved"];
+                return response()->json([
+                    "message" => "Data has been saved"
+                  ], 200);
             }
             else
             {
-                return ["Result"=>"Error"];
+                return response()->json([
+                    "message" => "Error"
+                  ], 404);
             }
         }
     }

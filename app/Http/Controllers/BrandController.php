@@ -11,6 +11,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\BrandResource;
 use App\Http\Resources\BrandCollection;
+use Illuminate\Http\Response;
 
 
 class BrandController extends Controller
@@ -88,18 +89,21 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Brand $brand_id)
+    public function update(Request $request,  $brand_id)
     {
-        $brand = Brand::find($brand_id);
-         $brand->brand_name=$request->brand_name;
-        $result = $brand->save();
+        $brand =  Brand::where('brand_id',$brand_id);
+        $result = $brand->update($request->all());
         if( $result)
         {
-            return ["Result"=>"Data has been saved"];
+            return response()->json([
+                "message" => "Data has been saved"
+              ], 200);
         }
         else
         {
-            return ["Result"=>"Error"];
+            return response()->json([
+                "message" => "Error"
+              ], 404);
         }
 
         
@@ -120,11 +124,11 @@ class BrandController extends Controller
             $brand->save();
     
             return response()->json([
-              "message" => "records updated successfully"
+              "message" => "deleted successfully"
             ], 200);
           } else {
             return response()->json([
-              "message" => "Book not found"
+              "message" => "Error"
             ], 404);
           }
 

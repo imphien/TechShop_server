@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\ulitilize\UUID;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
 
 class RAMController extends Controller
 {
@@ -57,11 +58,12 @@ class RAMController extends Controller
             $validator = Validator::make($item,$rules);
             if($validator->fails())
             {
-                return $validator->errors();
+                return response()->json($validator->errors(),404);
             }else
             {
                 $ram = new RAM;
-                $ram->ram_id='ram'.time();
+                $ram_id = new UUID();
+                $ram->ram_id=$ram_id->gen_uuid();
                 $ram->capacity_ram_id=$item['capacity_ram_id'];
                 $ram->ram_detail=$item['ram_detail'];
 
@@ -112,7 +114,7 @@ class RAMController extends Controller
         $validator = Validator::make($request->all(),$rules);
         if($validator->fails())
         {
-            return $validator->errors();
+            return response()->json($validator->errors(),404);
         }
         else
         {
@@ -120,11 +122,15 @@ class RAMController extends Controller
             $result = $ram->update($request->all());
             if( $result)
             {
-                return ["Result"=>"Data has been saved"];
+                return response()->json([
+                    "message" => "Data has been saved"
+                  ], 200);
             }
             else
             {
-                return ["Result"=>"Error"];
+                return response()->json([
+                    "message" => "Book not found"
+                  ], 404);
             }
     
         }
@@ -146,7 +152,7 @@ class RAMController extends Controller
             $ram->save();
     
             return response()->json([
-              "message" => "records updated successfully"
+              "message" => "Deleted successfully"
             ], 200);
           } else {
             return response()->json([

@@ -12,6 +12,7 @@ use App\Models\OrderDetail;
 use App\ulitilize\UUID;
 use Carbon\Carbon;
 use App\Http\Controllers\OrderDetailController;
+use Illuminate\Http\Response;
 
 class OrderController extends Controller
 {
@@ -43,25 +44,39 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        
-        $order = new Order();
-        $order_id = new UUID();
-        $temp = $order_id->gen_uuid();
-        $order->order_id = $temp;
-        $order->date = Carbon::now();
-        $order->customer_name = $request->customer_name;
-        $order->customer_phone_number = $request->customer_phone_number;
-        $order->customer_address = $request->customer_address;
-        $order->note = $request->note;
-        $order->email = $request->email;
-        $order->save();
-        foreach($request->products as $pro)
+        $rules = array(
+            "product_id" => [
+                'required',
+                Rule::exists('tbl_product')->where(function($query){
+                    $query->get('product_id');
+                }),
+            ]
+        );
+        $validator = Validator::make($request->all(),$rules);
+        if($validator->fails())
         {
-            $order_detail = new OrderDetail();
-            $order_detail->order_id = $temp;
-            $order_detail->product_id = $pro['product_id'];
-            $order_detail->quantity = $pro['quantity'];
-            $order_detail -> save();
+            return response()->json($validator->errors(),404);
+        }
+        else{
+            $order = new Order();
+            $order_id = new UUID();
+            $temp = $order_id->gen_uuid();
+            $order->order_id = $temp;
+            $order->date = Carbon::now();
+            $order->customer_name = $request->customer_name;
+            $order->customer_phone_number = $request->customer_phone_number;
+            $order->customer_address = $request->customer_address;
+            $order->note = $request->note;
+            $order->email = $request->email;
+            $order->save();
+            foreach($request->products as $pro)
+            {
+                $order_detail = new OrderDetail();
+                $order_detail->order_id = $temp;
+                $order_detail->product_id = $pro['product_id'];
+                $order_detail->quantity = $pro['quantity'];
+                $order_detail -> save();
+            }
         }
     }
 
