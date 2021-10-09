@@ -76,6 +76,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //Brand
    
     Route::post("/brand",[App\Http\Controllers\BrandController::class,'store']);
+    Route::put("/brand/{brand_id}",[App\Http\Controllers\BrandController::class,'update']);
      Route::put("/delete_brand/{brand_id}",[App\Http\Controllers\BrandController::class,'destroy']);
 
     //Capacity Ram
@@ -86,7 +87,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //Category Card
     Route::post("/categorycard",[App\Http\Controllers\CategoryCardController::class,'store']);
     Route::put("/categorycard/{category_card_id}",[App\Http\Controllers\CategoryCardController::class,'update']);
-    Route::put("/deleted_categorycard/{category_card_id}",[App\Http\Controllers\CategoryCardController::class,'destroy']);
+    Route::put("/delete_categorycard/{category_card_id}",[App\Http\Controllers\CategoryCardController::class,'destroy']);
 
     //Category CPU
     Route::post("/categorycpu",[App\Http\Controllers\CategoryCPUController::class,'store']);
@@ -138,9 +139,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post("/harddisk",[App\Http\Controllers\HardDiskController::class,'store']);
     Route::put("/harddisk/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'update']);
     Route::put("/delete_harddisk/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'destroy']);
-
-    //Order Detail
-    Route::post("/orderdetail",[App\Http\Controllers\OrderDetailController::class,'store']);
 
     //Order
     Route::post("/order",[App\Http\Controllers\OrderController::class,'store']);

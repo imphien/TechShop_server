@@ -60,6 +60,10 @@ class SearchController extends Controller
         {
             $result ->whereRaw("price > ".$price_min." and price <".$price_max);
         }
+        if($product_id = $request->input('product_id'))
+        {
+            $result ->whereRaw("tbl_product.product_id = '".$product_id."'");
+        }
         $product =  $result->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
         'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
         ->get()->toArray();

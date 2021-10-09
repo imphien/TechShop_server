@@ -10,6 +10,7 @@ use App\ulitilize\UUID;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Resources\CategoryCardResource;
+use Illuminate\Http\Response;
 
 
 
@@ -90,11 +91,15 @@ class CategoryCardController extends Controller
         $result = $category_card->update($request->all());
         if( $result)
         {
-            return ["Result"=>"Data has been saved"];
+            return response()->json([
+                "message" => "Data has been saved"
+              ], 200);
         }
         else
         {
-            return ["Result"=>"Error"];
+            return response()->json([
+                "message" => "Error"
+              ], 404);
         }
     }
 
@@ -113,11 +118,11 @@ class CategoryCardController extends Controller
             $categorycard->save();
     
             return response()->json([
-              "message" => "records updated successfully"
+              "message" => "Deleted successfully"
             ], 200);
           } else {
             return response()->json([
-              "message" => "Book not found"
+              "message" => "Error"
             ], 404);
           }
     }

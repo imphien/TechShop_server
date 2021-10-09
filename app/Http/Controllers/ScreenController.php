@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\ulitilize\UUID;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Response;
 
 
 class ScreenController extends Controller
@@ -59,13 +60,13 @@ class ScreenController extends Controller
             
             if($validator->fails())
             {
-                return $validator->errors();
+                return response()->json($validator->errors(),404);
             }
             else
             {
                 $screen = new Screen;
                 $screen_id = new UUID();
-                $screen->screen_id=$screen->get_uuid();
+                $screen->screen_id=$screen_id->gen_uuid();
                 $screen->category_screen_id=$item['category_screen_id'];
                 $screen->screen_detail=$item['screen_detail'];
 
@@ -103,7 +104,7 @@ class ScreenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $screen)
+    public function update(Request $request, $screen_id)
     {
         $rules = array(
             "category_screen_id"=>[
@@ -115,7 +116,7 @@ class ScreenController extends Controller
         $validator = Validator::make($request->all(),$rules);
         if($validator->fails())
         {
-            return $validator->errors();
+            return response()->json($validator->errors(),404);
         }
         else
         {
@@ -123,11 +124,15 @@ class ScreenController extends Controller
             $result = $screen->update($request->all());
             if( $result)
             {
-                return ["Result"=>"Data has been saved"];
+                return response()->json([
+                    "message" => " Data has been saved"
+                  ], 200);
             }
             else
             {
-                return ["Result"=>"Error"];
+                return response()->json([
+                    "message" => "Book not found"
+                  ], 404);
             }
         }
     }
@@ -150,7 +155,7 @@ class ScreenController extends Controller
             $screen->save();
     
             return response()->json([
-              "message" => "records deleted successfully"
+              "message" => " Deleted successfully"
             ], 200);
           } else {
             return response()->json([
