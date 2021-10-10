@@ -23,7 +23,9 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $order = DB::table('tbl_order')
+                    ->simplePaginate(10);
+        return $order;
     }
 
     /**
