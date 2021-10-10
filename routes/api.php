@@ -26,6 +26,9 @@ Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
 //Brand
  Route::get("/brand",[App\Http\Controllers\BrandController::class,'index']);
 
+ //Card
+ Route::get("/card",[App\Http\Controllers\CardController::class,'index']);
+
  //CapacityRam
  Route::get("/capacityram",[App\Http\Controllers\CapacityRamController::class,'index']);
 
@@ -88,6 +91,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post("/categorycard",[App\Http\Controllers\CategoryCardController::class,'store']);
     Route::put("/categorycard/{category_card_id}",[App\Http\Controllers\CategoryCardController::class,'update']);
     Route::put("/delete_categorycard/{category_card_id}",[App\Http\Controllers\CategoryCardController::class,'destroy']);
+
+    //Card
+    Route::post("/card",[App\Http\Controllers\CardController::class,'store']);
+    Route::put("/card/{card_id}",[App\Http\Controllers\CardController::class,'update']);
+    Route::put("/delete_card/{card_id}",[App\Http\Controllers\CardController::class,'destroy']);
 
     //Category CPU
     Route::post("/categorycpu",[App\Http\Controllers\CategoryCPUController::class,'store']);

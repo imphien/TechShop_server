@@ -19,7 +19,7 @@ class AuthController extends Controller
 
         $user = User::create([
             'name' => $fields['name'],
-            'email' => $fields['email'],
+            'email' => $fieldfs['email'],
             'password' => bcrypt($fields['password'])
         ]);
         
@@ -69,4 +69,6 @@ class AuthController extends Controller
             'message' => 'Logged out'
         ];
     }
+
+    
 }
