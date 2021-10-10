@@ -19,7 +19,9 @@ class OrderDetailController extends Controller
      */
     public function index()
     {
-        //
+        $orderdetail = DB::table('tbl_orderdetail')
+                    ->simplePaginate(10);
+        return $orderdetail;
     }
 
     /**

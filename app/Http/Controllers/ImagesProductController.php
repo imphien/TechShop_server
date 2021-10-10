@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ImagesProduct;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class ImagesProductController extends Controller
 {
@@ -14,7 +16,9 @@ class ImagesProductController extends Controller
      */
     public function index()
     {
-        //
+        $images = DB::table('tbl_imagesproduct')
+                ->simplePaginate(10);
+         return $images;
     }
 
     /**

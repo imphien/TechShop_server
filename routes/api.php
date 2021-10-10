@@ -64,8 +64,17 @@ Route::get("/ram",[App\Http\Controllers\RAMController::class,'index']);
  Route::get("/notdeletedproduct",[App\Http\Controllers\ProductController::class,'get_product_not_deleted']);
  Route::get("/productdetail",[App\Http\Controllers\ProductController::class,'get_product_detail']);
 
- 
- Route::get("/uuid",[App\Http\Controllers\BrandController::class,'gen_uuid']);
+ //CPU
+ Route::get("/cpu",[App\Http\Controllers\CPUController::class,'index']);
+
+ //images
+ Route::get("/images",[App\Http\Controllers\ImagesProductController::class,'index']);
+
+//Order
+Route::get("/order",[App\Http\Controllers\OrderController::class,'index']);
+
+//Orderdatail
+Route::get("/order",[App\Http\Controllers\OrderController::class,'index']);
 
 //search
 
