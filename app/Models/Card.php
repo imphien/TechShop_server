@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Card extends Model
 {
     protected $table = "tbl_card";
+    protected $primaryKey = "card_id";
 
     public function product()
     {

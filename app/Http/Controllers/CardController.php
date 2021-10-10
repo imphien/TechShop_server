@@ -3,29 +3,29 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\CPU;
-use App\Models\CategoryCPU;
+use App\Models\CategoryCard;
+use App\Models\Card;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\ulitilize\UUID;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Resources\CategoryCardResource;
 use Illuminate\Http\Response;
 
 
-class CPUController extends Controller
+class CardController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    
     public function index()
     {
-        $cpu = DB::table('tbl_cpu')
-                    ->simplePaginate(10);
-        return $cpu;
+        $card = DB::table('tbl_card')
+                ->simplePaginate(10);
+        return $card;
     }
 
     /**
@@ -47,10 +47,10 @@ class CPUController extends Controller
     public function store(Request $request)
     {
         $rules = array(
-            "category_cpu_id"=>[
+            "category_card_id"=>[
                 'required',
-                Rule::exists('tbl_categorycpu')->where(function ($query) {
-                    $query->get('category_cpu_id');
+                Rule::exists('tbl_categorycard')->where(function ($query) {
+                    $query->get('category_card_id');
                 }),
             ]
         );
@@ -64,16 +64,15 @@ class CPUController extends Controller
             }
             else
             {
-                $cpu = new CPU;
-                    $cpu_id = new UUID();
-                    $cpu->cpu_id = $cpu_id->gen_uuid();
-                    $cpu->category_cpu_id=$item['category_cpu_id'];
-                    $cpu->cpu_name=$item['cpu_name'];
-        
-                    $result = $cpu->save();
+                $card = new Card;
+                $card_id = new UUID();
+                $card->card_id = $card_id->gen_uuid();
+                $card->category_card_id=$item['category_card_id'];
+                $card->card_detail=$item['card_detail'];
+    
+                $card->save();
             }
         }
-        
     }
 
     /**
@@ -105,12 +104,12 @@ class CPUController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request,  $cpu_id)
+    public function update(Request $request, $card_id)
     {
         $rules = array(
-            "category_cpu_id"=>[
-                Rule::exists('tbl_categorycpu')->where(function ($query) {
-                    $query->get('category_cpu_id');
+            "category_card_id"=>[
+                Rule::exists('tbl_categorycard')->where(function ($query) {
+                    $query->get('category_card_id');
                 }),
             ]
         );
@@ -121,8 +120,8 @@ class CPUController extends Controller
         }
         else
         {
-            $cpu =  CPU::where('cpu_id',$cpu_id);
-            $result = $cpu->update($request->all());
+            $card =  Card::where('card_id',$card_id);
+            $result = $card->update($request->all());
             if( $result)
             {
                 return response()->json([
@@ -144,13 +143,13 @@ class CPUController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request,  $cpu_id)
+    public function destroy(Request $request, $card_id)
     {
-        if (CPU::where('cpu_id',$cpu_id)->exists()) {
-            $cpu= CPU::find($cpu_id);
-            if($cpu->deleted_at != NULL) return ["Result" => "CPU deleted"];
-            $cpu->deleted_at = Carbon::now();
-            $cpu->save();
+        if (Card::where('card_id',$card_id)->exists()) {
+            $card= Card::find($card_id);
+            if($card->deleted_at != NULL) return ["Result" => "Card deleted"];
+            $card->deleted_at = Carbon::now();
+            $card->save();
     
             return response()->json([
               "message" => "Deleted successfully"
