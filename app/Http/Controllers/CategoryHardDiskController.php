@@ -25,6 +25,40 @@ class CategoryHardDiskController extends Controller
         return $categoryharddisk;
     }
 
+    public function get_categoryharddisk_active()
+    {
+      $categoryharddisk = DB::table('tbl_categoryharddisk')
+              ->whereNull('deleted_at')
+              ->orderBy('category_harddisk_name','asc')
+              ->get();
+      return $categoryharddisk;
+    }
+
+    public function get_categoryharddisk_deleted()
+    {
+      $categoryharddisk = DB::table('tbl_categoryharddisk')
+              ->whereNotNull('deleted_at')
+              ->orderBy('category_harddisk_name','asc')
+              ->get();
+      return $categoryharddisk;
+    }
+
+    public function get_count_categoryharddisk_active()
+    {
+      $categoryharddisk = DB::table('tbl_categoryharddisk')
+              ->whereNull('deleted_at')
+              ->count();
+      return $categoryharddisk;
+    }
+
+    public function get_count_categoryharddisk_deleted()
+    {
+      $categoryharddisk = DB::table('tbl_categoryharddisk')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $categoryharddisk;
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -60,9 +94,16 @@ class CategoryHardDiskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($category_harddisk_id)
     {
-        //
+        $categoryharddisk = DB::table('tbl_categoryharddisk')
+              ->where('category_harddisk_id','=',$category_harddisk_id)
+              ->first();
+       if(!$categoryharddisk)
+       {
+        return response()->json('Invalid category_harddisk_id ',404);
+       }
+      return $categoryharddisk;
     }
 
     /**

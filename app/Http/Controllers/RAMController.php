@@ -22,8 +22,44 @@ class RAMController extends Controller
     public function index()
     {
         $ram = DB::table('tbl_ram')
-                    ->simplePaginate(10);
+                    ->get();
         return $ram;
+    }
+
+    public function get_ram_active()
+    {
+      $ram = DB::table('tbl_ram')
+              ->whereNull('deleted_at')
+              ->select('ram_id','ram_detail')
+              ->orderBy('ram_detail','asc')
+              ->get();
+      return $ram;
+    }
+
+    public function get_ram_deleted()
+    {
+      $ram = DB::table('tbl_ram')
+              ->whereNotNull('deleted_at')
+              ->select('ram_id','ram_detail')
+              ->orderBy('ram_detail','asc')
+              ->get();
+      return $ram;
+    }
+
+    public function get_count_ram_active()
+    {
+      $ram = DB::table('tbl_ram')
+              ->whereNull('deleted_at')
+              ->count();
+      return $ram;
+    }
+
+    public function get_count_ram_deleted()
+    {
+      $ram = DB::table('tbl_ram')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $ram;
     }
 
     /**
@@ -78,9 +114,16 @@ class RAMController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($ram_id)
     {
-        //
+        $ram = DB::table('tbl_ram')
+        ->where('ram_id','=',$ram_id)
+        ->first();
+        if(!$ram)
+        {
+        return response()->json('Invalid ram_id ',404);
+        }
+        return $ram;
     }
 
     /**
