@@ -54,7 +54,7 @@ Route::get("/ram",[App\Http\Controllers\RAMController::class,'index']);
   Route::get("/screen",[App\Http\Controllers\ScreenController::class,'index']);
 
   //Hard disk
-  Route::get("/harddisk",[App\Http\Controllers\ScreenController::class,'index']);
+  Route::get("/harddisk",[App\Http\Controllers\HardDiskController::class,'index']);
 
  //Product
  Route::get("/product",[App\Http\Controllers\ProductController::class,'index']);
