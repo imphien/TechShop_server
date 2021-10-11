@@ -30,7 +30,7 @@ class HardDiskController extends Controller
     {
       $harddisk = DB::table('tbl_harddisk')
               ->whereNull('deleted_at')
-              ->select('harddisk_id','capacity_harddisk')
+              ->select('harddisk_id','capacity_harddisk','created_at','deleted_at','updated_at')
               ->orderBy('capacity_harddisk','asc')
               ->get();
       return $harddisk;
@@ -40,7 +40,7 @@ class HardDiskController extends Controller
     {
       $harddisk = DB::table('tbl_harddisk')
               ->whereNotNull('deleted_at')
-              ->select('harddisk_id','capacity_harddisk')
+              ->select('harddisk_id','capacity_harddisk','created_at','deleted_at','updated_at')
               ->orderBy('capacity_harddisk','asc')
               ->get();
       return $harddisk;
@@ -88,12 +88,16 @@ class HardDiskController extends Controller
                 }),
             ]
         );
+        $index = [];
+        $i = 0;
         foreach($request->all() as $item)
         {
+            $i++;
             $validator = Validator::make($item,$rules);
             if($validator->fails())
             {
-                return response()->json($validator->errors(),404);
+                array_push($index,$i);
+                continue;
                 
             }else
             {
@@ -102,9 +106,17 @@ class HardDiskController extends Controller
                 $harddisk->harddisk_id = $harddisk_id->gen_uuid();
                 $harddisk->category_harddisk_id=$item['category_harddisk_id'];
                 $harddisk->capacity_harddisk=$item['capacity_harddisk'];
-                $result = $harddisk->save();
+                $harddisk->save();
             }
         }
+        $errors_index = '';
+        foreach($index as $i)
+        {
+            $errors_index = $errors_index.$i.' ';
+        }
+        if($errors_index == '')
+            return response()->json(["message"=>"Data has been saved "],200);
+        return response()->json(["message"=>"Invalid category_harddisk_id in position ".$errors_index." in payload"],404);
     }
 
     /**

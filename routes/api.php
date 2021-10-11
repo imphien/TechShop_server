@@ -40,7 +40,7 @@ Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
  Route::get("/card/deleted",[App\Http\Controllers\CardController::class,'get_card_deleted']);
  Route::get("/card/deleted/count",[App\Http\Controllers\CardController::class,'get_count_card_deleted']);
 
- Route::get("/card/{category_card_id}",[App\Http\Controllers\CardController::class,'show']);
+ Route::get("/card/{card_id}",[App\Http\Controllers\CardController::class,'show']);
 
  //CapacityRam
  Route::get("/capacityram/active",[App\Http\Controllers\CapacityRamController::class,'get_capacityram_active']);
@@ -122,22 +122,21 @@ Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
   Route::get("/harddisk/deleted",[App\Http\Controllers\HardDiskController::class,'get_harddisk_deleted']);
   Route::get("/harddisk/deleted/count",[App\Http\Controllers\HardDiskController::class,'get_count_harddisk_deleted']);
  
-  Route::get("/harddisk/{category_harddisk_id}",[App\Http\Controllers\HardDiskController::class,'show']);
+  Route::get("/harddisk/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'show']);
 
  //Product
  Route::get("/product",[App\Http\Controllers\ProductController::class,'index']); //lấy tất cả thành phần trong bảng product
  Route::get("/product/count",[App\Http\Controllers\ProductController::class,'countProduct']);
-
- Route::get("/product/detail",[App\Http\Controllers\ProductController::class,'get_product_detail']);//detail product join
- Route::get("/product/detail/{product_id}",[App\Http\Controllers\ProductController::class,'showdetail']);//detail product by id join
- Route::get("/product/{product_id}",[App\Http\Controllers\ProductController::class,'show']);//detail product by id not join
  
  Route::get("/product/deleted",[App\Http\Controllers\ProductController::class,'get_product_deleted']);
  Route::get("/product/deleted/count",[App\Http\Controllers\ProductController::class,'get_product_deleted_count']);
 
- Route::get("/product/active/count",[App\Http\Controllers\ProductController::class,'get_product_not_deleted_count']);
- Route::get("/product/active",[App\Http\Controllers\ProductController::class,'get_product_not_deleted']);
+ Route::get("/product/active/count",[App\Http\Controllers\ProductController::class,'get_product_active_count']);
+ Route::get("/product/active",[App\Http\Controllers\ProductController::class,'get_product_active']);
 
+ Route::get("/product/detail",[App\Http\Controllers\ProductController::class,'get_product_detail']);//detail product join
+ Route::get("/product/detail/{product_id}",[App\Http\Controllers\ProductController::class,'showdetail']);//detail product by id join
+ Route::get("/product/{product_id}",[App\Http\Controllers\ProductController::class,'show']);//detail product by id not join
  //CPU
  Route::get("/cpu/active",[App\Http\Controllers\CPUController::class,'get_cpu_active']);
  Route::get("/cpu/active/count",[App\Http\Controllers\CPUController::class,'get_count_cpu_active']);
@@ -145,7 +144,7 @@ Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
  Route::get("/cpu/deleted",[App\Http\Controllers\CPUController::class,'get_cpu_deleted']);
  Route::get("/cpu/deleted/count",[App\Http\Controllers\CPUController::class,'get_count_cpu_deleted']);
 
- Route::get("/cpu/{category_cpu_id}",[App\Http\Controllers\CPUController::class,'show']);
+ Route::get("/cpu/{cpu_id}",[App\Http\Controllers\CPUController::class,'show']);
 
 
  //images
@@ -216,8 +215,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //RAM
     Route::post("/ram",[App\Http\Controllers\RAMController::class,'store']);
-    Route::put("/ram/{id}",[App\Http\Controllers\RAMController::class,'update']);
-    Route::put("/ram/delete/{id}",[App\Http\Controllers\RAMController::class,'destroy']);
+    Route::put("/ram/{ram_id}",[App\Http\Controllers\RAMController::class,'update']);
+    Route::put("/ram/delete/{ram_id}",[App\Http\Controllers\RAMController::class,'destroy']);
 
     //Screen
     Route::post("/screen",[App\Http\Controllers\ScreenController::class,'store']);

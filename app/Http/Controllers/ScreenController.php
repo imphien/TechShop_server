@@ -31,7 +31,7 @@ class ScreenController extends Controller
     {
       $screen = DB::table('tbl_screen')
               ->whereNull('deleted_at')
-              ->select('screen_id','screen_detail')
+              ->select('screen_id','screen_detail','created_at','deleted_at','updated_at')
               ->orderBy('screen_detail','asc')
               ->get();
       return $screen;
@@ -41,7 +41,7 @@ class ScreenController extends Controller
     {
       $screen = DB::table('tbl_screen')
               ->whereNotNull('deleted_at')
-              ->select('screen_id','screen_detail')
+              ->select('screen_id','screen_detail','created_at','deleted_at','updated_at')
               ->orderBy('screen_detail','asc')
               ->get();
       return $screen;
@@ -89,14 +89,17 @@ class ScreenController extends Controller
                 }),
             ]
         );
-        
+        $index = [];
+        $i = 0;
         foreach($request->all() as $item)
         {
+            $i++;
             $validator = Validator::make($item,$rules);
             
             if($validator->fails())
             {
-                return response()->json($validator->errors(),404);
+                array_push($index,$i);
+                continue;
             }
             else
             {
@@ -106,9 +109,17 @@ class ScreenController extends Controller
                 $screen->category_screen_id=$item['category_screen_id'];
                 $screen->screen_detail=$item['screen_detail'];
 
-                $result = $screen->save();
+                $screen->save();
             }
         }
+        $errors_index = '';
+        foreach($index as $i)
+        {
+            $errors_index = $errors_index.$i.' ';
+        }
+        if($errors_index == '')
+            return response()->json(["message"=>"Data has been saved "],200);
+        return response()->json(["message"=>"Invalid category_screen_id in position ".$errors_index." in payload"],404);
     }
 
     /**

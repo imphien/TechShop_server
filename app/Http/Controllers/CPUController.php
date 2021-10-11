@@ -32,7 +32,7 @@ class CPUController extends Controller
     {
       $cpu = DB::table('tbl_cpu')
               ->whereNull('deleted_at')
-              ->select('cpu_id','cpu_name')
+              ->select('cpu_id','cpu_name','created_at','deleted_at','updated_at')
               ->orderBy('cpu_name','asc')
               ->get();
       return $cpu;
@@ -42,7 +42,7 @@ class CPUController extends Controller
     {
       $cpu = DB::table('tbl_cpu')
               ->whereNotNull('deleted_at')
-              ->select('cpu_id','cpu_name')
+              ->select('cpu_id','cpu_name','created_at','deleted_at','updated_at')
               ->orderBy('cpu_name','asc')
               ->get();
       return $cpu;
@@ -90,26 +90,36 @@ class CPUController extends Controller
                 }),
             ]
         );
+        $index = [];
+        $i = 0;
         foreach($request->all() as $item)
         {
+            $i++;
             $validator = Validator::make($item,$rules);
 
             if($validator->fails())
             {
-                return response()->json($validator->errors(),404);
+                array_push($index,$i);
+                continue;
             }
             else
             {
                 $cpu = new CPU;
-                    $cpu_id = new UUID();
-                    $cpu->cpu_id = $cpu_id->gen_uuid();
-                    $cpu->category_cpu_id=$item['category_cpu_id'];
-                    $cpu->cpu_name=$item['cpu_name'];
-        
-                    $result = $cpu->save();
+                $cpu_id = new UUID();
+                $cpu->cpu_id = $cpu_id->gen_uuid();
+                $cpu->category_cpu_id=$item['category_cpu_id'];
+                $cpu->cpu_name=$item['cpu_name'];
+                $result = $cpu->save();
             }
         }
-        
+        $errors_index = '';
+        foreach($index as $i)
+        {
+            $errors_index = $errors_index.$i.' ';
+        }
+        if($errors_index == '')
+            return response()->json(["message"=>"Data has been saved "],200);
+        return response()->json(["message"=>"Invalid category_cpu_id in position ".$errors_index." in payload"],404);
     }
 
     /**
