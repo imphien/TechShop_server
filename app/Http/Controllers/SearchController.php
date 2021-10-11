@@ -32,6 +32,10 @@ class SearchController extends Controller
         {
             $result ->whereRaw("product_name LIKE '%". $name ."%'");
         }
+        if($brand_id = $request->input('brand_id'))
+        {
+            $result ->whereRaw("tbl_product.brand_id = '". $brand_id . "'");
+        }
         if($cpu_id = $request->input('cpu_id'))
         {
             $result ->whereRaw("tbl_product.cpu_id = '". $cpu_id . "'");

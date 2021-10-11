@@ -17,9 +17,57 @@ class MachineSeriesController extends Controller
     public function index()
     {
         $class = DB::table('tbl_class')
-                    ->simplePaginate(10);
+                    ->get();
         return $class;
     }
+
+    public function get_class_active()
+    {
+      $class = DB::table('tbl_class')
+              ->whereNull('deleted_at')
+              ->select('class_id','class_name')
+              ->orderBy('class_name','asc')
+              ->get();
+      return $class;
+    }
+
+    public function get_class_deleted()
+    {
+      $class = DB::table('tbl_class')
+              ->whereNotNull('deleted_at')
+              ->select('class_id','class_name')
+              ->orderBy('class_name','asc')
+              ->get();
+      return $class;
+    }
+
+    public function get_count_class_active()
+    {
+      $class = DB::table('tbl_class')
+              ->whereNull('deleted_at')
+              ->count();
+      return $class;
+    }
+
+    public function get_count_class_deleted()
+    {
+      $class = DB::table('tbl_class')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $class;
+    }
+
+    public function show($class_id)
+    {
+      $class = DB::table('tbl_class')
+      ->where('class_id','=',$class_id)
+      ->first();
+      if(!$class)
+      {
+      return response()->json('Invalid class_id ',404);
+      }
+      return $class;
+    } 
 
     public function store(Request $request)
     {

@@ -22,8 +22,44 @@ class HardDiskController extends Controller
     public function index()
     {
         $harddisk = DB::table('tbl_harddisk')
-                    ->simplePaginate(10);
+                    ->get();
         return $yharddisk;
+    }
+
+    public function get_harddisk_active()
+    {
+      $harddisk = DB::table('tbl_harddisk')
+              ->whereNull('deleted_at')
+              ->select('harddisk_id','capacity_harddisk')
+              ->orderBy('capacity_harddisk','asc')
+              ->get();
+      return $harddisk;
+    }
+
+    public function get_harddisk_deleted()
+    {
+      $harddisk = DB::table('tbl_harddisk')
+              ->whereNotNull('deleted_at')
+              ->select('harddisk_id','capacity_harddisk')
+              ->orderBy('capacity_harddisk','asc')
+              ->get();
+      return $harddisk;
+    }
+
+    public function get_count_harddisk_active()
+    {
+      $harddisk = DB::table('tbl_harddisk')
+              ->whereNull('deleted_at')
+              ->count();
+      return $harddisk;
+    }
+
+    public function get_count_harddisk_deleted()
+    {
+      $harddisk = DB::table('tbl_harddisk')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $harddisk;
     }
 
     /**
@@ -77,9 +113,16 @@ class HardDiskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($harddisk_id)
     {
-        //
+        $harddisk = DB::table('tbl_harddisk')
+        ->where('harddisk_id','=',$harddisk_id)
+        ->first();
+        if(!$harddisk)
+        {
+        return response()->json('Invalid harddisk_id ',404);
+        }
+        return $harddisk;
     }
 
     /**

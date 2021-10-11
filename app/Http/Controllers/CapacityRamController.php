@@ -22,10 +22,43 @@ class CapacityRamController extends Controller
     public function index()
     {
         $capacityram = DB::table('tbl_capacityram')
-                    ->simplePaginate(10);
+                    ->get();
         return $capacityram;
     }
 
+    public function get_capacityram_active()
+    {
+      $capacityram = DB::table('tbl_capacityram')
+              ->whereNull('deleted_at')
+              ->orderBy('capacity_ram','asc')
+              ->get();
+      return $capacityram;
+    }
+
+    public function get_capacityram_deleted()
+    {
+      $capacityram = DB::table('tbl_capacityram')
+              ->whereNotNull('deleted_at')
+              ->orderBy('capacity_ram','asc')
+              ->get();
+      return $capacityram;
+    }
+
+    public function get_count_capacityram_active()
+    {
+      $capacityram = DB::table('tbl_capacityram')
+              ->whereNull('deleted_at')
+              ->count();
+      return $capacityram;
+    }
+
+    public function get_count_capacityram_deleted()
+    {
+      $capacityram = DB::table('tbl_capacityram')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $capacityram;
+    }
     /**
      * Show the form for creating a new resource.
      *
@@ -61,9 +94,16 @@ class CapacityRamController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($capacity_ram_id)
     {
-        //
+      $capacityram = DB::table('tbl_capacityram')
+              ->where('capacity_ram_id','=',$capacity_ram_id)
+              ->first();
+      if(!$capacityram)
+      {
+       return response()->json('Invalid capacity_ram_id ',404);
+      }
+     return $capacityram;
     }
 
     /**

@@ -24,8 +24,44 @@ class CardController extends Controller
     public function index()
     {
         $card = DB::table('tbl_card')
-                ->simplePaginate(10);
+                ->get();
         return $card;
+    }
+
+    public function get_card_active()
+    {
+      $card = DB::table('tbl_card')
+              ->whereNull('deleted_at')
+              ->select('card_id','card_detail')
+              ->orderBy('card_detail','asc')
+              ->get();
+      return $card;
+    }
+
+    public function get_card_deleted()
+    {
+      $card = DB::table('tbl_card')
+              ->whereNotNull('deleted_at')
+              ->select('card_id','card_detail')
+              ->orderBy('card_detail','asc')
+              ->get();
+      return $card;
+    }
+
+    public function get_count_card_active()
+    {
+      $card = DB::table('tbl_card')
+              ->whereNull('deleted_at')
+              ->count();
+      return $card;
+    }
+
+    public function get_count_card_deleted()
+    {
+      $card = DB::table('tbl_card')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $card;
     }
 
     /**
@@ -81,9 +117,16 @@ class CardController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($card_id)
     {
-        //
+        $card = DB::table('tbl_card')
+        ->where('card_id','=',$card_id)
+        ->first();
+        if(!$card)
+        {
+        return response()->json('Invalid card_id ',404);
+        }
+        return $card;
     }
 
     /**

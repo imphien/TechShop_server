@@ -24,8 +24,42 @@ class BrandController extends Controller
     public function index()
     {
         $brand = DB::table('tbl_brand')
-                    ->simplePaginate(10);
+               ->get();
         return $brand;
+    }
+
+    public function get_brand_active()
+    {
+      $brand = DB::table('tbl_brand')
+              ->whereNull('deleted_at')
+              ->orderBy('brand_name','asc')
+              ->get();
+      return $brand;
+    }
+
+    public function get_brand_delete()
+    {
+      $brand = DB::table('tbl_brand')
+              ->whereNotNull('deleted_at')
+              ->orderBy('brand_name','asc')
+              ->get();
+      return $brand;
+    }
+
+    public function get_count_brand_active()
+    {
+      $brand = DB::table('tbl_brand')
+              ->whereNull('deleted_at')
+              ->count();
+      return $brand;
+    }
+
+    public function get_count_brand_delete()
+    {
+      $brand = DB::table('tbl_brand')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $brand;
     }
 
     /**
@@ -66,9 +100,16 @@ class BrandController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Brand $brand)
+    public function show($brand_id)
     {
-        //
+      $brand = DB::table('tbl_brand')
+              ->where('brand_id','=',$brand_id)
+              ->first();
+       if(!$brand)
+       {
+        return response()->json('Invalid brand_id ',404);
+       }
+      return $brand;
     }
 
     /**

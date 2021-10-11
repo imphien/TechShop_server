@@ -21,8 +21,42 @@ class CategoryScreenController extends Controller
     public function index()
     {
         $categoryscreen = DB::table('tbl_categoryscreen')
-        ->simplePaginate(10);
+        ->get();
         return $categoryscreen;
+    }
+
+    public function get_categoryscreen_active()
+    {
+      $categoryscreen = DB::table('tbl_categoryscreen')
+              ->whereNull('deleted_at')
+              ->orderBy('screen_size','asc')
+              ->get();
+      return $categoryscreen;
+    }
+
+    public function get_categoryscreen_deleted()
+    {
+      $categoryscreen = DB::table('tbl_categoryscreen')
+              ->whereNotNull('deleted_at')
+              ->orderBy('screen_size','asc')
+              ->get();
+      return $categoryscreen;
+    }
+
+    public function get_count_categoryscreen_active()
+    {
+      $categoryscreen = DB::table('tbl_categoryscreen')
+              ->whereNull('deleted_at')
+              ->count();
+      return $categoryscreen;
+    }
+
+    public function get_count_categoryscreen_deleted()
+    {
+      $categoryscreen = DB::table('tbl_categoryscreen')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $categoryscreen;
     }
 
     /**
@@ -59,9 +93,16 @@ class CategoryScreenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($category_screen_id)
     {
-        //
+        $categoryscreen = DB::table('tbl_categoryscreen')
+              ->where('category_screen_id','=',$category_screen_id)
+              ->first();
+       if(!$categoryscreen)
+       {
+        return response()->json('Invalid category_screen_id ',404);
+       }
+      return $categoryscreen;
     }
 
     /**

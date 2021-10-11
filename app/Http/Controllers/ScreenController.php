@@ -23,8 +23,44 @@ class ScreenController extends Controller
     public function index()
     {
         $screen = DB::table('tbl_screen')
-                    ->simplePaginate(10);
+                    ->get();
         return $screen;
+    }
+
+    public function get_screen_active()
+    {
+      $screen = DB::table('tbl_screen')
+              ->whereNull('deleted_at')
+              ->select('screen_id','screen_detail')
+              ->orderBy('screen_detail','asc')
+              ->get();
+      return $screen;
+    }
+
+    public function get_screen_deleted()
+    {
+      $screen = DB::table('tbl_screen')
+              ->whereNotNull('deleted_at')
+              ->select('screen_id','screen_detail')
+              ->orderBy('screen_detail','asc')
+              ->get();
+      return $screen;
+    }
+
+    public function get_count_screen_active()
+    {
+      $screen = DB::table('tbl_screen')
+              ->whereNull('deleted_at')
+              ->count();
+      return $screen;
+    }
+
+    public function get_count_screen_deleted()
+    {
+      $screen = DB::table('tbl_screen')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $screen;
     }
 
     /**
@@ -81,9 +117,16 @@ class ScreenController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($screen_id)
     {
-        //
+        $screen = DB::table('tbl_screen')
+        ->where('screen_id','=',$screen_id)
+        ->first();
+        if(!$screen)
+        {
+        return response()->json('Invalid screen_id ',404);
+        }
+        return $screen;
     }
 
     /**

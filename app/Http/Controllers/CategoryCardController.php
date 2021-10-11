@@ -24,8 +24,42 @@ class CategoryCardController extends Controller
     public function index()
     {
         $categorycard = DB::table('tbl_categorycard')
-                    ->simplePaginate(10);
+                    ->get();
         return $categorycard;
+    }
+
+    public function get_categorycard_active()
+    {
+      $categorycard = DB::table('tbl_categorycard')
+              ->whereNull('deleted_at')
+              ->orderBy('category_card_name','asc')
+              ->get();
+      return $categorycard;
+    }
+
+    public function get_categorycard_deleted()
+    {
+      $categorycard = DB::table('tbl_categorycard')
+              ->whereNotNull('deleted_at')
+              ->orderBy('category_card_name','asc')
+              ->get();
+      return $categorycard;
+    }
+
+    public function get_count_categorycard_active()
+    {
+      $categorycard = DB::table('tbl_categorycard')
+              ->whereNull('deleted_at')
+              ->count();
+      return $categorycard;
+    }
+
+    public function get_count_categorycard_deleted()
+    {
+      $categorycard = DB::table('tbl_categorycard')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $categorycard;
     }
 
     /**
@@ -62,9 +96,16 @@ class CategoryCardController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($category_card_id)
     {
-        //
+        $categorycard = DB::table('tbl_categorycard')
+              ->where('category_card_id','=',$category_card_id)
+              ->first();
+       if(!$categorycard)
+       {
+        return response()->json('Invalid categoru_card_id ',404);
+       }
+      return $categorycard;
     }
 
     /**

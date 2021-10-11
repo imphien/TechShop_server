@@ -24,8 +24,44 @@ class CPUController extends Controller
     public function index()
     {
         $cpu = DB::table('tbl_cpu')
-                    ->simplePaginate(10);
+                    ->get();
         return $cpu;
+    }
+
+    public function get_cpu_active()
+    {
+      $cpu = DB::table('tbl_cpu')
+              ->whereNull('deleted_at')
+              ->select('cpu_id','cpu_name')
+              ->orderBy('cpu_name','asc')
+              ->get();
+      return $cpu;
+    }
+
+    public function get_cpu_deleted()
+    {
+      $cpu = DB::table('tbl_cpu')
+              ->whereNotNull('deleted_at')
+              ->select('cpu_id','cpu_name')
+              ->orderBy('cpu_name','asc')
+              ->get();
+      return $cpu;
+    }
+
+    public function get_count_cpu_active()
+    {
+      $cpu = DB::table('tbl_cpu')
+              ->whereNull('deleted_at')
+              ->count();
+      return $cpu;
+    }
+
+    public function get_count_cpu_deleted()
+    {
+      $cpu = DB::table('tbl_cpu')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $cpu;
     }
 
     /**
@@ -82,9 +118,16 @@ class CPUController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($cpu_id)
     {
-        //
+        $cpu = DB::table('tbl_cpu')
+        ->where('cpu_id','=',$cpu_id)
+        ->first();
+        if(!$cpu)
+        {
+        return response()->json('Invalid cpu_id ',404);
+        }
+        return $cpu;
     }
 
     /**

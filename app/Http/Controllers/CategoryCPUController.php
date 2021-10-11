@@ -21,8 +21,42 @@ class CategoryCPUController extends Controller
     public function index()
     {
         $categorycpu = DB::table('tbl_categorycpu')
-                    ->simplePaginate(10);
+                    ->get();
         return $categorycpu;
+    }
+
+    public function get_categorycpu_active()
+    {
+      $categorycpu = DB::table('tbl_categorycpu')
+              ->whereNull('deleted_at')
+              ->orderBy('category_cpu_name','asc')
+              ->get();
+      return $categorycpu;
+    }
+
+    public function get_categorycpu_deleted()
+    {
+      $categorycpu = DB::table('tbl_categorycpu')
+              ->whereNotNull('deleted_at')
+              ->orderBy('category_cpu_name','asc')
+              ->get();
+      return $categorycpu;
+    }
+
+    public function get_count_categorycpu_active()
+    {
+      $categorycpu = DB::table('tbl_categorycpu')
+              ->whereNull('deleted_at')
+              ->count();
+      return $categorycpu;
+    }
+
+    public function get_count_categorycpu_deleted()
+    {
+      $categorycpu = DB::table('tbl_categorycpu')
+              ->whereNotNull('deleted_at')
+              ->count();
+      return $categorycpu;
     }
 
     /**
@@ -60,9 +94,16 @@ class CategoryCPUController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($category_cpu_id)
     {
-        //
+        $categorycpu = DB::table('tbl_categorycpu')
+              ->where('category_cpu_id','=',$category_cpu_id)
+              ->first();
+       if(!$categorycpu)
+       {
+        return response()->json('Invalid category_cpu_id ',404);
+       }
+      return $categorycpu;
     }
 
     /**
