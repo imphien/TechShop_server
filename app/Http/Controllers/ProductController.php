@@ -73,11 +73,28 @@ class ProductController extends Controller
 
     }
 
-    public function countProduct()
+    public function count_Product()
     {
         $countProduct = DB::table('tbl_product')->count();
         return $countProduct;
     }
+
+    public function get_product_deleted_count()
+    {
+        $countProduct =  $product_deleted = DB::table('tbl_product')
+                        ->whereNotNull('deleted_at')
+                        ->count();
+        return $countProduct;
+    }
+
+    public function get_product_active_count()
+    {
+        $countProduct =  $product_deleted = DB::table('tbl_product')
+                        ->whereNull('deleted_at')
+                        ->count();
+        return $countProduct;
+    }
+
 
     public function get_product_deleted()
     {
@@ -118,7 +135,7 @@ class ProductController extends Controller
         return $product_deleted;
     }
 
-    public function get_product_not_deleted()
+    public function get_product_active()
     {
         $product_not_deleted = DB::table('tbl_product')
                                     ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
@@ -162,16 +179,16 @@ class ProductController extends Controller
     {
 
         $product_detail = DB::table('tbl_product')
-        ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
-        ->join('tbl_harddisk','tbl_harddisk.harddisk_id','=','tbl_product.harddisk_id')
-        ->join('tbl_brand','tbl_brand.brand_id','=','tbl_product.brand_id')
-        ->join('tbl_ram','tbl_ram.ram_id','=','tbl_product.ram_id')
-        ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
-        ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
-        ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
-        ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
-        'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
-        ->get()->toArray();
+                ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
+                ->join('tbl_harddisk','tbl_harddisk.harddisk_id','=','tbl_product.harddisk_id')
+                ->join('tbl_brand','tbl_brand.brand_id','=','tbl_product.brand_id')
+                ->join('tbl_ram','tbl_ram.ram_id','=','tbl_product.ram_id')
+                ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
+                ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
+                ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
+                ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
+                'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
+                ->get()->toArray();
         $array_product = array_column($product_detail,'product_id'); 
          $url = DB::table('tbl_imagesproduct')
                 ->whereIn('product_id',$array_product)
@@ -268,12 +285,16 @@ class ProductController extends Controller
             "discount" => 'required|numeric',
             "product_detail" => 'required'
         );
+        $index = [];
+        $i = 0;
         foreach($request->all() as $item)
         {
+            $i++;
             $validator = Validator::make($item,$rules);
             if($validator->fails())
             {
-                return response()->json( $validator->errors(),404);
+                array_push($index,$i);
+                continue;
             }
             else{
                 
@@ -311,7 +332,14 @@ class ProductController extends Controller
             }
             
         }
-      
+        $errors_index = '';
+        foreach($index as $i)
+        {
+            $errors_index = $errors_index.$i.' ';
+        }
+        if($errors_index == '')
+            return response()->json(["message"=>"Data has been saved "],200);
+        return response()->json(["message"=>"Invalid data in position ".$errors_index." in payload"],404);
     }
 
     /**
@@ -320,9 +348,82 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Product $product_id)
+    public function show($product_id)
     {
-        
+        $product_detail = DB::table('tbl_product')
+                        ->where('product_id','=',$product_id)
+                        ->get()->toArray();
+        $array_product = array_column($product_detail,'product_id'); 
+        $url = DB::table('tbl_imagesproduct')
+                ->whereIn('product_id',$array_product)
+                ->select('url','product_id')
+                ->get()->toArray();
+        $array_images = [];
+        foreach($url as $value)
+            {
+            $array_images[$value->product_id][] = $value->url;
+            }
+        foreach($product_detail as $key=>$pr)
+            {
+                if(isset($array_images[$pr->product_id]) )
+                    {
+                    
+                        $product_detail[$key]->images = $array_images[$pr->product_id];
+                    }
+                else
+                    {
+                        $product_detail[$key]->images =[];
+                    }
+                }
+        if(!$product_detail)
+        {
+        return response()->json('Invalid product_id ',404);
+        }
+        return array_values($product_detail)[0];
+       
+    }
+
+    public function showdetail($product_id)
+    {
+        $product_detail = DB::table('tbl_product')
+                        ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
+                                ->join('tbl_harddisk','tbl_harddisk.harddisk_id','=','tbl_product.harddisk_id')
+                                ->join('tbl_brand','tbl_brand.brand_id','=','tbl_product.brand_id')
+                                ->join('tbl_ram','tbl_ram.ram_id','=','tbl_product.ram_id')
+                                ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
+                                ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
+                                ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
+                                ->where('product_id','=',$product_id)
+                                ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
+                                'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
+                                ->get()->toArray();
+        $array_product = array_column($product_detail,'product_id'); 
+        $url = DB::table('tbl_imagesproduct')
+                ->whereIn('product_id',$array_product)
+                ->select('url','product_id')
+                ->get()->toArray();
+        $array_images = [];
+        foreach($url as $value)
+            {
+            $array_images[$value->product_id][] = $value->url;
+            }
+        foreach($product_detail as $key=>$pr)
+            {
+                if(isset($array_images[$pr->product_id]) )
+                    {
+                    
+                        $product_detail[$key]->images = $array_images[$pr->product_id];
+                    }
+                else
+                    {
+                        $product_detail[$key]->images =[];
+                    }
+                }
+        if(!$product_detail)
+        {
+        return response()->json('Invalid product_id ',404);
+        }
+        return array_values($product_detail)[0];
        
     }
 

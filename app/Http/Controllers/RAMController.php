@@ -30,7 +30,7 @@ class RAMController extends Controller
     {
       $ram = DB::table('tbl_ram')
               ->whereNull('deleted_at')
-              ->select('ram_id','ram_detail')
+              ->select('ram_id','ram_detail','created_at','deleted_at','updated_at')
               ->orderBy('ram_detail','asc')
               ->get();
       return $ram;
@@ -40,7 +40,7 @@ class RAMController extends Controller
     {
       $ram = DB::table('tbl_ram')
               ->whereNotNull('deleted_at')
-              ->select('ram_id','ram_detail')
+              ->select('ram_id','ram_detail','created_at','deleted_at','updated_at')
               ->orderBy('ram_detail','asc')
               ->get();
       return $ram;
@@ -88,13 +88,16 @@ class RAMController extends Controller
                 }),
             ]
         );
-       
+        $index = [];
+        $i = 0;
        foreach($request->all() as $item)
        {
+            $i++;
             $validator = Validator::make($item,$rules);
             if($validator->fails())
             {
-                return response()->json($validator->errors(),404);
+                array_push($index,$i);
+                continue;
             }else
             {
                 $ram = new RAM;
@@ -106,6 +109,15 @@ class RAMController extends Controller
                 $result = $ram->save();
             }
         }
+
+        $errors_index = '';
+        foreach($index as $i)
+        {
+            $errors_index = $errors_index.$i.' ';
+        }
+        if($errors_index == '')
+            return response()->json(["message"=>"Data has been saved "],200);
+        return response()->json(["message"=>"Invalid capacity_ram_id in position ".$errors_index." in payload"],404);
     }
 
     /**
