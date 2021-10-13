@@ -19,7 +19,7 @@ class SearchController extends Controller
 {
     public function search(Request $request)
     {
-        $result = DB::table('tbl_product')
+        $result = Product::with('image_product')
                 ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
                 ->join('tbl_harddisk','tbl_harddisk.harddisk_id','=','tbl_product.harddisk_id')
                 ->join('tbl_brand','tbl_brand.brand_id','=','tbl_product.brand_id')
@@ -70,29 +70,7 @@ class SearchController extends Controller
         }
         $product =  $result->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
         'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
-        ->get()->toArray();
-        $array_product = array_column($product,'product_id'); 
-         $url = DB::table('tbl_imagesproduct')
-                ->whereIn('product_id',$array_product)
-                ->select('url','product_id')
-                ->get()->toArray();
-         $array_images = [];
-        foreach($url as $value)
-            {
-               $array_images[$value->product_id][] = $value->url;
-            }
-        foreach($product as $key=>$pr)
-            {
-                if(isset($array_images[$pr->product_id]) )
-                    {
-                       
-                        $product[$key]->images = $array_images[$pr->product_id];
-                    }
-                else
-                    {
-                        $product[$key]->images =[];
-                    }
-                }
+        ->paginate(10);
         return $product;
     }
 }

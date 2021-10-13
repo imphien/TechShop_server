@@ -18,7 +18,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
+Route::get("/test",[App\Http\Controllers\ProductController::class,'test']);
 
 //Public route
 Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
@@ -123,10 +123,13 @@ Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
   Route::get("/harddisk/deleted/count",[App\Http\Controllers\HardDiskController::class,'get_count_harddisk_deleted']);
  
   Route::get("/harddisk/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'show']);
+//search
+
+Route::get("/product/search",[App\Http\Controllers\SearchController::class,'search']);
 
  //Product
  Route::get("/product",[App\Http\Controllers\ProductController::class,'index']); //lấy tất cả thành phần trong bảng product
- Route::get("/product/count",[App\Http\Controllers\ProductController::class,'countProduct']);
+ Route::get("/product/count",[App\Http\Controllers\ProductController::class,'count_Product']);
  
  Route::get("/product/deleted",[App\Http\Controllers\ProductController::class,'get_product_deleted']);
  Route::get("/product/deleted/count",[App\Http\Controllers\ProductController::class,'get_product_deleted_count']);
@@ -155,10 +158,6 @@ Route::get("/order",[App\Http\Controllers\OrderController::class,'index']);
 
 //Orderdatail
 Route::get("/order",[App\Http\Controllers\OrderController::class,'index']);
-
-//search
-
-Route::get("/search",[App\Http\Controllers\SearchController::class,'search']);
 
 Route::post("/register",[App\Http\Controllers\AuthController::class,'register']);
 //Protected route

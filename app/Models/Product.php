@@ -9,6 +9,7 @@ class Product extends Model
 {
     protected $table = "tbl_product";
     protected $primaryKey = "product_id"; 
+    protected $keyType = 'string';
 
     public function cpu(){
         return $this->belongsTo('App\Models\CPU','cpu_id','product_id');
@@ -39,7 +40,7 @@ class Product extends Model
     }
 
     public function image_product(){
-        return $this->hasMany('App\Models\ImagesProduct','image_id','product_id');
+        return $this->hasMany('App\Models\ImagesProduct','product_id','product_id');
     }
 
     public function order(){
