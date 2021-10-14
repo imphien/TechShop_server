@@ -26,7 +26,12 @@ class SearchController extends Controller
                 ->join('tbl_ram','tbl_ram.ram_id','=','tbl_product.ram_id')
                 ->join('tbl_screen','tbl_product.screen_id','=','tbl_screen.screen_id')
                 ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
-                ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id');
+                ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
+                ->join('tbl_categorycpu','tbl_categorycpu.category_cpu_id','=','tbl_cpu.category_cpu_id')
+                ->join('tbl_categoryharddisk','tbl_categoryharddisk.category_harddisk_id','=','tbl_harddisk.category_harddisk_id')
+                ->join('tbl_capacityram','tbl_capacityram.capacity_ram_id','=','tbl_ram.capacity_ram_id')
+                ->join('tbl_categoryscreen','tbl_categoryscreen.category_screen_id','=','tbl_screen.category_screen_id')
+                ->join('tbl_categorycard','tbl_categorycard.category_card_id','=','tbl_card.category_card_id');
 
         if($name = $request->input('name'))
         {
@@ -36,33 +41,37 @@ class SearchController extends Controller
         {
             $result ->whereRaw("tbl_product.brand_id = '". $brand_id . "'");
         }
-        if($cpu_id = $request->input('cpu_id'))
+        if($category_cpu_name = $request->input('category_cpu_name'))
         {
-            $result ->whereRaw("tbl_product.cpu_id = '". $cpu_id . "'");
+            $result ->whereRaw("tbl_categorycpu.category_cpu_name = '". $category_cpu_name . "'");
         }
-        if($harddisk_id = $request->input('harddisk_id'))
+        if($category_harddisk_name = $request->input('category_harddisk_name'))
         {
-            $result ->whereRaw("tbl_product.harddisk_id = '".$harddisk_id."'");
+            $result ->whereRaw("tbl_categoryharddisk.category_harddisk_name = '".$category_harddisk_name."'");
         }
-        if($ram_id = $request->input('ram_id'))
+        if($capacity_ram = $request->input('capacity_ram'))
         {
-            $result ->whereRaw("tbl_product.ram_id = '".$ram_id."'");
+            $result ->whereRaw("tbl_capacityram.capacity_ram = '".$capacity_ram."'");
         }
-        if($screen_id = $request->input('screen_id'))
+        if($screen_size = $request->input('screen_size'))
         {
-            $result ->whereRaw("tbl_product.screen_id = '".$screen_id."'");
+            $result ->whereRaw("tbl_categoryscreen.screen_size = '".$screen_size."'");
         }
-        if($card_id = $request->input('card_id'))
+        if($category_card_name = $request->input('category_card_name'))
         {
-            $result ->whereRaw("tbl_product.card_id = '".$card_id."'");
+            $result ->whereRaw("tbl_categorycard.category_card_name = '".$category_card_name."'");
         }
         if($class_id = $request->input('class_id'))
         {
             $result ->whereRaw("tbl_product.class_id = '".$class_id."'");
         }
-        if($price_min = $request->input('price_min') && $price_max = $request->input('price_max'))
+        if($price_min = $request->input('price_min') )
         {
-            $result ->whereRaw("price > ".$price_min." and price <".$price_max);
+            $result ->whereRaw("price >= ".$price_min);
+        }
+        if($price_max = $request->input('price_max') )
+        {
+            $result ->whereRaw("price <= ".$price_max);
         }
         if($product_id = $request->input('product_id'))
         {
