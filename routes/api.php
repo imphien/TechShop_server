@@ -153,8 +153,9 @@ Route::get("/product/search",[App\Http\Controllers\SearchController::class,'sear
  //images
  Route::get("/images",[App\Http\Controllers\ImagesProductController::class,'index']);
 
+
 //Order
-Route::get("/order",[App\Http\Controllers\OrderController::class,'index']);
+Route::post("/order",[App\Http\Controllers\OrderController::class,'store']);
 
 //Orderdatail
 Route::get("/order",[App\Http\Controllers\OrderController::class,'index']);
@@ -238,5 +239,5 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put("/harddisk/delete/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'destroy']);
 
     //Order
-    Route::post("/order",[App\Http\Controllers\OrderController::class,'store']);
+    Route::get("/order",[App\Http\Controllers\OrderController::class,'index']); 
 });

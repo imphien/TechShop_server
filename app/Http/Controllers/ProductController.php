@@ -124,7 +124,7 @@ class ProductController extends Controller
                 ->join('tbl_card','tbl_product.card_id','=','tbl_card.card_id')
                 ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
                 ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
-                'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
+                'size','price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
                  ->paginate(10);
         return $product_detail;
        
@@ -288,7 +288,7 @@ class ProductController extends Controller
                                 ->join('tbl_class','tbl_product.class_id','=','tbl_class.class_id')
                                 ->where('product_id','=',$product_id)
                                 ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
-                                'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
+                                'size','price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
                                 ->get()->first();
         if(!$product_detail)
         {

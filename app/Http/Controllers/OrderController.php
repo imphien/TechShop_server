@@ -47,11 +47,14 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $rules = array(
-            "product_id" => [
+            "products.*.product_id" => [
                 'required',
                 Rule::exists('tbl_product')->where(function($query){
-                    $query->get('product_id');
+                    $query->get('tbl_product.product_id');
                 }),
+            ],
+            "products.*.quantity" => [
+                'required'
             ]
         );
         $validator = Validator::make($request->all(),$rules);
