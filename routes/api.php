@@ -140,6 +140,8 @@ Route::get("/product/search",[App\Http\Controllers\SearchController::class,'sear
  Route::get("/product/detail",[App\Http\Controllers\ProductController::class,'get_product_detail']);//detail product join
  Route::get("/product/detail/{product_id}",[App\Http\Controllers\ProductController::class,'showdetail']);//detail product by id join
  Route::get("/product/{product_id}",[App\Http\Controllers\ProductController::class,'show']);//detail product by id not join
+ 
+ Route::get("/product/active/best_seller",[App\Http\Controllers\ProductController::class,'best_seller']);
  //CPU
  Route::get("/cpu/active",[App\Http\Controllers\CPUController::class,'get_cpu_active']);
  Route::get("/cpu/active/count",[App\Http\Controllers\CPUController::class,'get_count_cpu_active']);
