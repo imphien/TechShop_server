@@ -390,7 +390,29 @@ class ProductController extends Controller
         else
         {
             $product =  Product::where('product_id',$product_id);
-            $result = $product->update($request->all());
+            
+
+            if ($request->has('images')) {
+                DB::table('tbl_imagesproduct')
+                ->where('product_id',$product_id)
+                ->delete();
+
+                foreach($request->input('images') as $img)
+                {
+                    $image = new ImagesProduct();
+                    $image_id = new UUID();
+                    $image->image_id = $image_id->gen_uuid();
+                    $image->product_id = $product_id;
+                    $image->url = $img['url'];
+                    $image->save();
+                }
+            }
+
+            $result = $product->update(['cpu_id' =>$request->cpu_id,'harddisk_id' =>$request->harddisk_id,'brand_id' =>$request->brand_id,
+            'ram_id' =>$request->ram_id,'screen_id' =>$request->screen_id,'card_id' =>$request->card_id,'class_id' =>$request->class_id,'mass' =>$request->mass,
+            'size' =>$request->size,'camera' =>$request->camera,'price' =>$request->price,'discount' =>$request->discount,'product_detail'=>$request->product_detail]);
+            
+
             if( $result)
             {
                 return response()->json([
