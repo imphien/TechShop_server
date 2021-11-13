@@ -62,7 +62,10 @@ class ProductController extends Controller
                 ->limit('4')
                 ->get();
         $result = json_decode($max_quantity, true);
-        $product_id = $result['0']['product_id'];
+        $tmp = array();
+        for($i = 0; $i <= 3; ++$i)
+        {
+        $product_id = $result[$i]['product_id'];
         $product = Product::with('image_product')
                 ->join('tbl_cpu','tbl_cpu.cpu_id','=','tbl_product.cpu_id')
                 ->join('tbl_harddisk','tbl_harddisk.harddisk_id','=','tbl_product.harddisk_id')
@@ -75,7 +78,9 @@ class ProductController extends Controller
                 ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
                 'price','discount','product_detail','tbl_product.created_at','tbl_product.deleted_at','tbl_product.updated_at')
                 ->get();
-        return  $product;
+        $tmp[] = $product;
+        }
+        return  $tmp;
     }
 
     public function count_Product()
