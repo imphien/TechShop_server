@@ -123,6 +123,17 @@ Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
   Route::get("/harddisk/deleted/count",[App\Http\Controllers\HardDiskController::class,'get_count_harddisk_deleted']);
  
   Route::get("/harddisk/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'show']);
+
+  //news
+  Route::get("/article",[App\Http\Controllers\NewsController::class,'get_article']);
+  Route::get("/article/deleted",[App\Http\Controllers\NewsController::class,'get_article_deleted']);
+
+  Route::get("/article/count",[App\Http\Controllers\NewsController::class,'get_count']);
+  Route::get("/article/{news_id}",[App\Http\Controllers\NewsController::class,'show']);
+
+
+
+ 
 //search
 
 Route::get("/product/search",[App\Http\Controllers\SearchController::class,'search']);
@@ -137,11 +148,13 @@ Route::get("/product/search",[App\Http\Controllers\SearchController::class,'sear
  Route::get("/product/active/count",[App\Http\Controllers\ProductController::class,'get_product_active_count']);
  Route::get("/product/active",[App\Http\Controllers\ProductController::class,'get_product_active']);
 
+ Route::get("/product/best_seller",[App\Http\Controllers\ProductController::class,'best_seller']);
+
  Route::get("/product/detail",[App\Http\Controllers\ProductController::class,'get_product_detail']);//detail product join
  Route::get("/product/detail/{product_id}",[App\Http\Controllers\ProductController::class,'showdetail']);//detail product by id join
  Route::get("/product/{product_id}",[App\Http\Controllers\ProductController::class,'show']);//detail product by id not join
  
- Route::get("/product/active/best_seller",[App\Http\Controllers\ProductController::class,'best_seller']);
+
  //CPU
  Route::get("/cpu/active",[App\Http\Controllers\CPUController::class,'get_cpu_active']);
  Route::get("/cpu/active/count",[App\Http\Controllers\CPUController::class,'get_count_cpu_active']);
@@ -242,4 +255,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //Order
     Route::get("/order",[App\Http\Controllers\OrderController::class,'index']); 
+
+    //news
+    Route::post("/article",[App\Http\Controllers\NewsController::class,'store']);
+    Route::put("/article/{news_id}",[App\Http\Controllers\NewsController::class,'update']);
+    Route::put("/article/delete/{news_id}",[App\Http\Controllers\NewsController::class,'destroy']);
 });

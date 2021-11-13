@@ -85,6 +85,10 @@ class SearchController extends Controller
         {
             $result ->orderByRaw("product_name ".$sort);
         }
+        if($isPromotion = $request->input('isPromotion'))
+        {
+            $isPromotion == 'true' ? $result ->whereRaw("tbl_product.discount > 0") :  $result ->whereRaw("1=1");
+        }
         $product =  $result
                     ->whereNull('tbl_product.deleted_at')
                     ->select('tbl_product.product_id','product_name','cpu_name','capacity_harddisk','brand_name','ram_detail','card_detail','class_name','screen_detail','mass',
