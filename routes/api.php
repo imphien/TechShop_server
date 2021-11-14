@@ -254,8 +254,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put("/harddisk/delete/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'destroy']);
 
     //Order
-    Route::get("/order",[App\Http\Controllers\OrderController::class,'index']); 
-
+    Route::post("/order",[App\Http\Controllers\OrderController::class,'store']);
+    
     //news
     Route::post("/article",[App\Http\Controllers\NewsController::class,'store']);
     Route::put("/article/{news_id}",[App\Http\Controllers\NewsController::class,'update']);
