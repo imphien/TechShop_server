@@ -133,6 +133,9 @@ Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
   Route::get("/article/count",[App\Http\Controllers\NewsController::class,'get_count']);
   Route::get("/article/{news_id}",[App\Http\Controllers\NewsController::class,'show']);
 
+  //image
+  Route::post("/upload",[App\Http\Controllers\ProductController::class,'uploadImages']);
+
 
 
  
@@ -244,10 +247,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post("/product",[App\Http\Controllers\ProductController::class,'store']);
     Route::put("/product/{product_id}",[App\Http\Controllers\ProductController::class,'update']);
     Route::put("/product/delete/{product_id}",[App\Http\Controllers\ProductController::class,'destroy']);
-
-     //Image Product
-    Route::post("/upload",[App\Http\Controllers\ImagesProductController::class,'upload']);
-    Route::post("/images",[App\Http\Controllers\ImagesProductController::class,'store']);
 
 
     //Hard Disk

@@ -286,6 +286,23 @@ class ProductController extends Controller
         return response()->json(["message"=>"Invalid data in position ".$errors_index." in payload"],404);
     }
 
+    public function uploadImages(Request $request)
+    {
+        $upload = $request->file('new_image');
+        $image_product = array();
+        foreach($upload as $value)
+        {
+            $get_name_image = $value->getClientOriginalName();
+            $new_name = current(explode('.',$get_name_image));
+            $new_image = $new_name.rand(0,99).'.'.$value->getClientOriginalExtension();
+            $value->move('upload',$new_image);
+            array_push($image_product, (object)[
+                'url' => $new_image , 
+            ]);
+        }
+        return $image_product; 
+    }
+
     /**
      * Display the specified resource.
      *
