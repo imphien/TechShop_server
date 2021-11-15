@@ -127,6 +127,8 @@ Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
   //news
   Route::get("/article",[App\Http\Controllers\NewsController::class,'get_article']);
   Route::get("/article/deleted",[App\Http\Controllers\NewsController::class,'get_article_deleted']);
+  Route::get("/article/newest",[App\Http\Controllers\NewsController::class,'get_newest_article']);
+
 
   Route::get("/article/count",[App\Http\Controllers\NewsController::class,'get_count']);
   Route::get("/article/{news_id}",[App\Http\Controllers\NewsController::class,'show']);

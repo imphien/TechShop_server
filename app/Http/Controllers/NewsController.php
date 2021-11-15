@@ -19,12 +19,23 @@ class NewsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function get_article()
+
+    public function get_newest_article()
     {
         $result = DB::table('tbl_news')
                     ->whereNull('deleted_at')
                     ->orderby('created_at','desc')
-                    ->get();
+                    ->first();
+        return $result->news_id;
+    }
+    public function get_article()
+    {
+        $ignore = $this->get_newest_article();
+        $result = DB::table('tbl_news')
+                    ->whereNull('deleted_at')
+                    ->whereRaw("news_id <>'".$ignore."'")
+                    ->orderby('created_at','desc')
+                    ->paginate(1);
         return $result;
     }
 
@@ -71,6 +82,7 @@ class NewsController extends Controller
                 $uuid = new UUID();
                 $news->news_id = $uuid->gen_uuid();
                 $news->title = $item['title'];
+                $news->thumbnail = $item['thumbnail'];
                 $news->author = $item['author'];
                 $news->short_description = $item['short_description'];
                 $news->content = $item['content'];
