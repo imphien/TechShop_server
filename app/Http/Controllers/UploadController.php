@@ -16,7 +16,7 @@ class UploadController extends Controller
                 $get_name_image = $value->getClientOriginalName();
                 $new_name = current(explode('.',$get_name_image));
                 $new_image = $new_name.rand(0,99).'.'.$value->getClientOriginalExtension();
-                $value->move('upload/image',$new_image);
+                $value->move('upload',$new_image);
                 array_push($image, (object)[
                     'url' => $new_image , 
                 ]);
@@ -30,7 +30,7 @@ class UploadController extends Controller
             $get_name_thumbnail = $image_thumbnail->getClientOriginalName();
             $new_name_thumbnail = current(explode('.',$get_name_thumbnail));
             $new_image_thumbnail = $new_name_thumbnail.rand(0,99).'.'.$image_thumbnail->getClientOriginalExtension();
-            $image_thumbnail->move('upload/thumbail',$new_name_thumbnail);
+            $image_thumbnail->move('upload',$new_image_thumbnail);
             return $new_image_thumbnail;
         }
 
