@@ -131,12 +131,8 @@ Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
 
 
   Route::get("/article/count",[App\Http\Controllers\NewsController::class,'get_count']);
+  Route::get("/article/search",[App\Http\Controllers\NewsController::class,'search']);
   Route::get("/article/{news_id}",[App\Http\Controllers\NewsController::class,'show']);
-
-  //image
-  
-
-
 
  
 //search

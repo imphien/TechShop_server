@@ -55,7 +55,20 @@ class NewsController extends Controller
                     ->count();
         return $result;
     }
-
+    
+    public function search(Request $request)
+    {
+        $result = DB::table('tbl_news');
+                
+        if($name = $request->input('name'))
+        {
+            $result ->whereRaw("title LIKE '%". $name ."%'");    
+        }
+        $news = $result
+                ->whereNull('deleted_at')
+                ->paginate(10);
+        return $news;
+    }
 
 
     /**
