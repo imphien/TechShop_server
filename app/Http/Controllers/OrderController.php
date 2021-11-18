@@ -78,7 +78,7 @@ class OrderController extends Controller
             {
                 $order_detail = new OrderDetail();
                 $order_detail->order_id = $temp;
-                $order_detail->product_id = $pro['product_id'];
+            $order_detail->product_id = $pro['product_id'];
                 $order_detail->quantity = $pro['quantity'];
                 $order_detail -> save();
             }

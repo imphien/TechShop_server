@@ -23,6 +23,9 @@ Route::get("/test",[App\Http\Controllers\ProductController::class,'test']);
 //Public route
 Route::post("/login",[App\Http\Controllers\AuthController::class,'Login']);
 
+//taskbar
+Route::get("/taskbar",[App\Http\Controllers\TaskbarController::class,'index']);
+
 //Brand
  Route::get("/brand/active",[App\Http\Controllers\BrandController::class,'get_brand_active']);
  Route::get("/brand/active/count",[App\Http\Controllers\BrandController::class,'get_count_brand_active']);
@@ -178,8 +181,12 @@ Route::get("/order",[App\Http\Controllers\OrderController::class,'index']);
 Route::post("/register",[App\Http\Controllers\AuthController::class,'register']);
 //Protected route
 Route::group(['middleware' => ['auth:sanctum']], function () {
-   
+    //taskbar
+    Route::post("/taskbar",[App\Http\Controllers\TaskbarController::class,'store']);
+    Route::put("/taskbar/{taskbar_id}",[App\Http\Controllers\TaskbarController::class,'update']);
+    Route::put("/taskbar/delete/{taskbar_id}",[App\Http\Controllers\TaskbarController::class,'destroy']);
 
+    //logout
     Route::post("/logout",[App\Http\Controllers\AuthController::class,'logout']);
 
     //Brand
