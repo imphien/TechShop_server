@@ -88,6 +88,7 @@ class BrandController extends Controller
                 $uuid = new UUID();
                 $brand->brand_id = $uuid->gen_uuid();
                 $brand->brand_name = $item['brand_name'];
+                $brand->link = $item['link'];
                 $result=$brand->save();
             }
            

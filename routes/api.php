@@ -35,6 +35,9 @@ Route::get("/taskbar",[App\Http\Controllers\TaskbarController::class,'index']);
 
  Route::get("/brand/{brand_id}",[App\Http\Controllers\BrandController::class,'show']);
 
+ //Banner
+ Route::get("/banner",[App\Http\Controllers\BannerController::class,'index']);
+
 
  //Card
  Route::get("/card/active",[App\Http\Controllers\CardController::class,'get_card_active']);
@@ -194,6 +197,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put("/brand/{brand_id}",[App\Http\Controllers\BrandController::class,'update']);
     Route::put("/brand/delete/{brand_id}",[App\Http\Controllers\BrandController::class,'destroy']);
 
+    //Banner
+    Route::post("/banner",[App\Http\Controllers\BannerController::class,'store']);
+    Route::put("/banner/{banner_id}",[App\Http\Controllers\BannerController::class,'update']);
+    Route::put("/banner/delete/{banner_id}",[App\Http\Controllers\BannerController::class,'destroy']);
+
     //Capacity Ram
     Route::post("/capacityram",[App\Http\Controllers\CapacityRamController::class,'store']);
     Route::put("/capacityram/{capacity_ram_id}",[App\Http\Controllers\CapacityRamController::class,'update']);
@@ -258,11 +266,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //Order
     Route::post("/order",[App\Http\Controllers\OrderController::class,'store']);
+    Route::get("/orderdetail",[App\Http\Controllers\OrderController::class,'searchOrder']);
+
+
     
     //news
     Route::post("/article",[App\Http\Controllers\NewsController::class,'store']);
     Route::put("/article/{news_id}",[App\Http\Controllers\NewsController::class,'update']);
     Route::put("/article/delete/{news_id}",[App\Http\Controllers\NewsController::class,'destroy']);
+
 
     //image
     Route::post("/upload",[App\Http\Controllers\UploadController::class,'upload']);

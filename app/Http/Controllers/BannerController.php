@@ -3,18 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Banner;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Pagination\Paginator;
 use Carbon\Carbon;
-use Illuminate\Pagination\LengthAwarePaginator;
+use App\ulitilize\UUID;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
-use App\ulitilize\UUID;
 use Illuminate\Http\Response;
-use App\Http\Controllers\PaginationController;
-use App\Models\Taskbar;
 
-class TaskbarController extends Controller
+class BannerController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -23,7 +20,7 @@ class TaskbarController extends Controller
      */
     public function index()
     {
-        $result = DB::table('tbl_taskbar')->whereNull('deleted_at')->orderBy('created_at','asc')->get();
+        $result = DB::table('tbl_banner')->whereNull('deleted_at')->get();
         return $result;
     }
 
@@ -47,12 +44,12 @@ class TaskbarController extends Controller
     {
         foreach($request->all() as $item)
         {
-            $taskbar = new Taskbar;
-            $tmp = new UUID;
-            $taskbar->taskbar_id = $tmp->gen_uuid();
-            $taskbar->taskbar_name = $item['taskbar_name'];
-            $taskbar->taskbar_url = $item['taskbar_url'];
-            $taskbar->save();
+            $banner = new Banner;
+            $id = new UUID;
+            $banner->banner_id = $id->gen_uuid();
+            $banner->banner_image = $item['banner_image'];
+            $banner->link = $item['link'];
+            $banner->save();
         }
     }
 
@@ -85,10 +82,10 @@ class TaskbarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $taskbar_id)
+    public function update(Request $request, $banner_id)
     {
-        $taskbar =  Taskbar::where('taskbar_id',$taskbar_id);
-        $result = $taskbar->update($request->all());
+        $banner =  Banner::where('banner_id',$banner_id);
+        $result = $banner->update($request->all());
         if( $result)
         {
             return response()->json([
@@ -109,13 +106,13 @@ class TaskbarController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($taskbar_id)
+    public function destroy($banner_id)
     {
-        if (Taskbar::where('taskbar_id',$taskbar_id)->exists()) {
-            $taskbar = Taskbar::find($taskbar_id);
-            if($taskbar->deleted_at != NULL) return ["Result" => "Đã xóa rồi"];
-            $taskbar->deleted_at = Carbon::now();
-            $taskbar->save();
+        if (Banner::where('banner_id',$banner_id)->exists()) {
+            $banner = Banner::find($banner_id);
+            if($banner->deleted_at != NULL) return ["Result" => "Đã xóa rồi"];
+            $banner->deleted_at = Carbon::now();
+            $banner->save();
     
             return response()->json([
               "message" => "deleted successfully"

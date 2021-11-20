@@ -10,6 +10,7 @@ class Product extends Model
     protected $table = "tbl_product";
     protected $primaryKey = "product_id"; 
     protected $keyType = 'string';
+    protected $hidden = array('privot');
 
     public function cpu(){
         return $this->belongsTo('App\Models\CPU','cpu_id','product_id');
@@ -44,6 +45,7 @@ class Product extends Model
     }
 
     public function order(){
-        return $this->belongsToMany('App\Models\Order','tbl_orderdetail','product_id','order_id');
+        return $this->belongsToMany(Order::class, 'tbl_orderdetail','product_id','order_id');
     }
+
 }

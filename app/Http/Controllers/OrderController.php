@@ -13,6 +13,10 @@ use App\ulitilize\UUID;
 use Carbon\Carbon;
 use App\Http\Controllers\OrderDetailController;
 use Illuminate\Http\Response;
+use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrderDetailResource;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\OrderCollection;
 
 class OrderController extends Controller
 {
@@ -26,6 +30,18 @@ class OrderController extends Controller
         $order = DB::table('tbl_order')
                     ->simplePaginate(10);
         return $order;
+    }
+
+    public function searchOrder(Request $request)
+    {
+       $order = Order::with('product');
+       if($status = $request->input('status'))
+       {
+           $order->whereRaw("status = '".$status."'" );
+       }
+        $result = $order
+                ->select('order_id','customer_name','customer_address','email','note','created_at','status')->paginate(5);
+        return $result;
     }
 
     /**

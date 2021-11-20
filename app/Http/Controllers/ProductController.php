@@ -59,11 +59,11 @@ class ProductController extends Controller
                 ->select('product_id', DB::raw('SUM(quantity) as total_sales'))
                 ->groupBy('product_id')
                 ->orderByRaw('total_sales DESC')
-                ->limit('2')
+                ->limit('4')
                 ->get();
         $result = json_decode($max_quantity, true);
         $tmp = array();
-        for($i = 0; $i <= 1; ++$i)
+        for($i = 0; $i <= 3; ++$i)
         {
         $product_id = $result[$i]['product_id'];
         $product = Product::with('image_product')

@@ -85,6 +85,10 @@ class SearchController extends Controller
         {
             $result ->orderByRaw("product_name ".$sort);
         }
+        if($ignore = $request->input('ignore_id'))
+        {
+            $result ->whereRaw("tbl.product.product_id <> '".$ignore."'");
+        }
         if($isPromotion = $request->input('isPromotion'))
         {
             $isPromotion == 'true' ? $result ->whereRaw("tbl_product.discount > 0") :  $result ->whereRaw("1=1");

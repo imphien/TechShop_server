@@ -2,12 +2,12 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class ImagesProductCollection extends ResourceCollection
+class OrderResource extends JsonResource
 {
     /**
-     * Transform the resource collection into an array.
+     * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array|\Illuminate\Contracts\Support\Arrayable|\JsonSerializable
@@ -15,7 +15,8 @@ class ImagesProductCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'url' => $this->url,
+            "order_id" => $this->order_id,
+            "products" => ProductResource::collection($this->product)
         ];
     }
 }
