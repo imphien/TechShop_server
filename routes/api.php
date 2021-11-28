@@ -97,10 +97,10 @@ Route::get("/taskbar",[App\Http\Controllers\TaskbarController::class,'index']);
  //Machine Series
  Route::get("/class/active",[App\Http\Controllers\MachineSeriesController::class,'get_class_active']);
   Route::get("/class/active/count",[App\Http\Controllers\MachineSeriesController::class,'get_count_class_active']);
- 
+
   Route::get("/class/deleted",[App\Http\Controllers\MachineSeriesController::class,'get_class_deleted']);
   Route::get("/class/deleted/count",[App\Http\Controllers\MachineSeriesController::class,'get_count_class_deleted']);
- 
+
   Route::get("/class/{class_id}",[App\Http\Controllers\MachineSeriesController::class,'show']);
 
   //RAM
@@ -124,10 +124,10 @@ Route::get("/taskbar",[App\Http\Controllers\TaskbarController::class,'index']);
   //Hard disk
   Route::get("/harddisk/active",[App\Http\Controllers\HardDiskController::class,'get_harddisk_active']);
   Route::get("/harddisk/active/count",[App\Http\Controllers\HardDiskController::class,'get_count_harddisk_active']);
- 
+
   Route::get("/harddisk/deleted",[App\Http\Controllers\HardDiskController::class,'get_harddisk_deleted']);
   Route::get("/harddisk/deleted/count",[App\Http\Controllers\HardDiskController::class,'get_count_harddisk_deleted']);
- 
+
   Route::get("/harddisk/{harddisk_id}",[App\Http\Controllers\HardDiskController::class,'show']);
 
   //news
@@ -140,7 +140,7 @@ Route::get("/taskbar",[App\Http\Controllers\TaskbarController::class,'index']);
   Route::get("/article/search",[App\Http\Controllers\NewsController::class,'search']);
   Route::get("/article/{news_id}",[App\Http\Controllers\NewsController::class,'show']);
 
- 
+
 //search
 
 Route::get("/product/search",[App\Http\Controllers\SearchController::class,'search']);
@@ -148,7 +148,7 @@ Route::get("/product/search",[App\Http\Controllers\SearchController::class,'sear
  //Product
  Route::get("/product",[App\Http\Controllers\ProductController::class,'index']); //lấy tất cả thành phần trong bảng product
  Route::get("/product/count",[App\Http\Controllers\ProductController::class,'count_Product']);
- 
+
  Route::get("/product/deleted",[App\Http\Controllers\ProductController::class,'get_product_deleted']);
  Route::get("/product/deleted/count",[App\Http\Controllers\ProductController::class,'get_product_deleted_count']);
 
@@ -160,7 +160,7 @@ Route::get("/product/search",[App\Http\Controllers\SearchController::class,'sear
  Route::get("/product/detail",[App\Http\Controllers\ProductController::class,'get_product_detail']);//detail product join
  Route::get("/product/detail/{product_id}",[App\Http\Controllers\ProductController::class,'showdetail']);//detail product by id join
  Route::get("/product/{product_id}",[App\Http\Controllers\ProductController::class,'show']);//detail product by id not join
- 
+
 
  //CPU
  Route::get("/cpu/active",[App\Http\Controllers\CPUController::class,'get_cpu_active']);
@@ -176,10 +176,6 @@ Route::get("/product/search",[App\Http\Controllers\SearchController::class,'sear
  Route::get("/images",[App\Http\Controllers\ImagesProductController::class,'index']);
 
 
-
-
-//Orderdatail
-Route::get("/order",[App\Http\Controllers\OrderController::class,'index']);
 
 Route::post("/register",[App\Http\Controllers\AuthController::class,'register']);
 //Protected route
@@ -266,10 +262,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     //Order
     Route::post("/order",[App\Http\Controllers\OrderController::class,'store']);
+    Route::put("/order/{order_id}",[App\Http\Controllers\OrderController::class,'update']);
+    Route::get("/orderdetail/{order_id}",[App\Http\Controllers\OrderController::class,'show']);
     Route::get("/orderdetail",[App\Http\Controllers\OrderController::class,'searchOrder']);
 
+    //Orderdetail
+    Route::get("/order",[App\Http\Controllers\OrderController::class,'index']);
+    Route::get("/order/count",[App\Http\Controllers\OrderController::class,'countOrder']);
 
-    
+
+
     //news
     Route::post("/article",[App\Http\Controllers\NewsController::class,'store']);
     Route::put("/article/{news_id}",[App\Http\Controllers\NewsController::class,'update']);

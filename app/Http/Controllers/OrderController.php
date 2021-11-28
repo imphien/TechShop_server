@@ -94,7 +94,7 @@ class OrderController extends Controller
             {
                 $order_detail = new OrderDetail();
                 $order_detail->order_id = $temp;
-            $order_detail->product_id = $pro['product_id'];
+                $order_detail->product_id = $pro['product_id'];
                 $order_detail->quantity = $pro['quantity'];
                 $order_detail -> save();
             }
@@ -107,9 +107,24 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($order_id)
     {
-        //
+        $order = Order::with('product')->where('order_id',$order_id)->first();
+        if(!$order)
+        {
+            return response()->json('Invalid order_id ',404);
+        }
+        return $order;
+    }
+
+    public function countOrder(Request $request)
+    {
+        $result = DB::table('tbl_order');
+        if($status = $request->input('status'))
+        {
+            $result ->where('status',$status);
+        }
+        return $result->count();
     }
 
     /**
@@ -130,9 +145,33 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $order_id)
     {
-        //
+        $rules = array(
+            "status" => [
+                'required',
+                Rule::in(['shipped','approved','complete']),
+            ],
+        );
+        $validator = Validator::make($request->all(),$rules);
+        if($validator->fails())
+        {
+            return response()->json($validator->errors(),404);
+        }
+        else {
+            $order = Order::where('order_id', $order_id);
+            $result = $order->update($request->all());
+            if ($result) {
+                return response()->json([
+                    "message" => "Data has been saved"
+                ], 200);
+            } else {
+                return response()->json([
+                    "message" => "Error"
+                ], 404);
+            }
+        }
+
     }
 
     /**
